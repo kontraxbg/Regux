@@ -1,0 +1,29 @@
+﻿@model Kontrax.Regux.Model.Call.ServicesModel
+
+@{
+    ViewBag.Title = "Вътрешноадминистративни услуги в RegiX";
+}
+
+@section Subtitle {
+    Изберете услуга
+}
+
+<div class="panel panel-info">
+    <div class="panel-heading"></div>
+    <div class="panel-body h4">
+        <ul>
+            <li>@Html.ActionLink("Тест на връзката с RegiX", "RegiXTestConnection")<br /><br /></li>
+            <li>@Html.ActionLink("Тест на проста бланка по ZADSAdapter\\RegistrationInfoRequest.xsd при Иван", "Form", new { xsdPath = "RegistrationInfoRequest" })<br /><br /></li>
+            <li>@Html.ActionLink("Тест на сложна бланка по ZADSAdapter\\RegistrationInfoResponse.xsd при Иван", "Form", new { xsdPath = "RegistrationInfoResponse" })<br /><br /></li>
+        </ul>
+
+        Списък с всички xsd–та на "@Kontrax.Regux.Portal.Controllers.CallController.XsdRootPath".<br />
+        Включени са и xsd-тата за отговорите - просто за теста, защото са по-сложни.<br /><br />
+        <ul>
+            @foreach (var service in Model.Services)
+            {
+                <li>@Html.ActionLink(service.Name, "Form", new { xsdPath = service.Code })<br /><br /></li>
+            }
+        </ul>
+    </div>
+</div>

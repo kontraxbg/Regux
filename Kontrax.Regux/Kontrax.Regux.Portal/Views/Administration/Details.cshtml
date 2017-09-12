@@ -1,0 +1,117 @@
+﻿@model Kontrax.Regux.Model.Administration.AdministrationViewModel
+
+@{
+    ViewBag.Title = "Детайли";
+}
+
+@section Subtitle {
+    @Html.ActionLink("Назад към списъка с администрации", "Index")
+}
+
+<div class="panel panel-info">
+    <div class="panel-heading"></div>
+    <div class="panel-body">
+        <div class="row">
+            @Html.LabelFor(model => model.Code, new { @class = "control-label col-md-2 text-right" })
+            @Html.DisplayFor(model => model.Code, new { @class = "col-md-10" })
+        </div>
+        <div class="form-group row">
+            @Html.LabelFor(model => model.ParentName, new { @class = "control-label col-md-2 text-right" })
+            @Html.DisplayFor(model => model.ParentName, new { @class = "col-md-10" })
+        </div>
+        <div class="row">
+            @Html.LabelFor(model => model.Name, new { @class = "control-label col-md-2 text-right" })
+            @Html.DisplayFor(model => model.Name, new { @class = "col-md-10" })
+        </div>
+    </div>
+</div>
+
+
+<div class="panel panel-default">
+    <div class="panel-heading clearfix">
+        @Html.DisplayNameFor(model => model.Certificate)
+    <div class="btn-group pull-right" role="group" aria-label="...">
+        <a href="#" class="btn btn-default" data-bind="click: removeCertificate"><span class="glyphicon glyphicon-trash"></span> Премахни</a>
+    </div>
+</div>
+<div class="panel-body">
+    @Html.DisplayFor(model => model.CertificateView)
+</div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading clearfix">
+        @Html.DisplayNameFor(model => model.ProposedCertificate)
+    <div class="btn-group pull-right" role="group" aria-label="...">
+        <a href="#" class="btn btn-default" data-bind="click: generateProposedCertificate"><span class="glyphicon glyphicon-ok"></span> Издай CA</a>
+        <a href="#" class="btn btn-default" data-bind="click: approveProposedCertificate"><span class="glyphicon glyphicon-ok"></span> Одобри</a>
+        <a href="#" class="btn btn-default" data-bind="click: removeProposedCertificate"><span class="glyphicon glyphicon-trash"></span> Премахни</a>
+    </div>
+</div>
+<div class="panel-body">
+    @Html.DisplayFor(model => model.ProposedCertificateView)
+</div>
+</div>
+
+@section Scripts{
+    <script src="~/Scripts/knockout-3.4.2.js"></script>
+    <script>
+        function AdministrationDetailsViewModel() {
+            var self = this;
+
+            self.generateProposedCertificate = function () {
+                $.get(app.baseUrl + 'api/Administration/GenerateProposedCertificate/' + @Model.Id)
+                    .success(function (data) {
+                        if (data) {
+                            location.reload();
+                        }
+                        else {
+                            app.showSimpleModal("Сертификат", "Грешка при генериране на сертификат");
+                        }
+                });
+            }
+
+            self.approveProposedCertificate = function () {
+                $.get(app.baseUrl + 'api/Administration/ApproveProposedCertificate/' + @Model.Id)
+                    .success(function (data) {
+                        if (data) {
+                            location.reload();
+                        }
+                        else {
+                            app.showSimpleModal("Сертификат", "Грешка при одобрение на сертификат");
+                        }
+                });
+            }
+
+            self.removeProposedCertificate = function () {
+                $.get(app.baseUrl + 'api/Administration/RemoveProposedCertificate/' + @Model.Id)
+                    .success(function (data) {
+                        if (data) {
+                            location.reload();
+                        }
+                        else {
+                            app.showSimpleModal("Сертификат", "Грешка при премахване на сертификат");
+                        }
+                });
+            }
+
+            self.removeCertificate = function () {
+                $.get(app.baseUrl + 'api/Administration/RemoveCertificate/' + @Model.Id)
+                    .success(function (data) {
+                        if (data) {
+                            location.reload();
+                        }
+                        else {
+                            app.showSimpleModal("Сертификат", "Грешка при премахване на сертификат");
+                        }
+                });
+            }
+        }
+
+        $(function () {
+            var vm = new AdministrationDetailsViewModel();
+
+            ko.applyBindings(vm);
+        });
+    </script>
+}

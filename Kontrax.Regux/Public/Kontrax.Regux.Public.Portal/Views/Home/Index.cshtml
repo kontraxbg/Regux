@@ -1,0 +1,12 @@
+﻿@{
+    ViewBag.Title = "Министерски съвет";
+}
+<div class="container body-content">
+    <div class="jumbotron text-center">
+        <h1>Министерски съвет</h1>
+        <p class="lead">Добре дошли в портала на Министерски съвет</p>
+
+        <button class="btn btn-default" type="button" onclick="location.href='@Url.Action("Create", "Complaint")'">Подайте сигнал</button>
+        <button class="btn btn-default" type="button" onclick="location.href='@Url.Action("Details", "Complaint")'">Подадени сигнали</button>
+    </div>
+</div>

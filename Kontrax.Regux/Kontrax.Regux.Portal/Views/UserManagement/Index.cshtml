@@ -1,0 +1,91 @@
+﻿@model Kontrax.Regux.Model.UserManagement.UsersViewModel
+
+@{
+    ViewBag.Title = "Потребители";
+}
+
+@section Subtitle {
+    @Html.ActionLink("Назад към администриране", "Index", "Admin")
+}
+
+<div class="panel panel-info">
+    <div class="panel-heading"></div>
+    <div class="panel-body">
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            <div class="form-horizontal">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.AdministrationId, new { @class = "control-label col-md-2" })
+                    <div class="col-md-6">
+                        @Html.DropDownListFor(model => model.AdministrationId, new SelectList(Model.Administrations, "Id", "Name"), "(всички)", new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.AdministrationId)
+                    </div>
+                    @Html.LabelFor(model => model.LocalRoleCode, new { @class = "control-label col-md-2" })
+                    <div class="col-md-2">
+                        @Html.DropDownListFor(model => model.LocalRoleCode, new SelectList(Model.LocalRoles, "Code", "Name"), "(всички)", new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.LocalRoleCode)
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-3">
+                        <input class="col-md-12 btn btn-primary" type="submit" value="Търсене" />
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    <div class="panel-heading"></div>
+    <div class="panel-body">
+        @if (Model.Users != null)
+        {
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>@Html.DisplayNameFor(model => model.Users.First().UserName)</th>
+                        <th>@Html.DisplayNameFor(model => model.Users.First().PersonName)</th>
+                        <th>@Html.DisplayNameFor(model => model.Users.First().Email)</th>
+                        <th>@Html.DisplayNameFor(model => model.Users.First().PhoneNumber)</th>
+                        <th>@Html.DisplayNameFor(model => model.Users.First().AdministrationName)</th>
+                        <th>@Html.DisplayNameFor(model => model.Users.First().LocalRoleName)</th>
+                        <th>
+                            @if (Model.CurrentUser.CanAddEmployees)
+                            {
+                                @Html.ActionLink("Добавяне", "Create", new { administrationId = Model.AdministrationId }, new { @class = "btn btn-sm btn-default pull-right" })
+                            }
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model.Users)
+                    {
+                        <tr class="@(user.IsGlobalAdmin ? "success" : null)">
+                            <td>@Html.DisplayFor(_ => user.UserName)</td>
+                            <td>@Html.DisplayFor(_ => user.PersonName)</td>
+                            <td>@Html.DisplayFor(_ => user.Email)</td>
+                            <td>@Html.DisplayFor(_ => user.PhoneNumber)</td>
+                            <td>@Html.DisplayFor(_ => user.AdministrationName)</td>
+                            <td>
+                                @Html.DisplayFor(_ => user.LocalRoleName)
+                                @if (user.IsGlobalAdmin)
+                                {
+                                    if (!string.IsNullOrEmpty(user.LocalRoleName))
+                                    {
+                                        <br />
+                                    }
+                                    @Html.DisplayNameFor(_ => user.IsGlobalAdmin)
+                                }
+                            </td>
+                            <td>
+                                @if (Model.CurrentUser.CanAddEmployees)
+                                {
+                                    @Html.ActionLink("Редактиране", "Edit", new { id = user.Id }, new { @class = "btn btn-sm btn-default pull-right" })
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>

@@ -1,0 +1,76 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    @{
+        string title = ViewBag.Title;
+        string commonTitle = "RegUX";
+    }
+    <title>
+        @(!string.IsNullOrEmpty(title) ? string.Format("{0} - {1}", title, commonTitle) : commonTitle)
+    </title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    <link rel="home" id="applicationBaseUrl" href="@Url.Content("~/")" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="@Url.Action("Index", "Home")" class="navbar-brand"> <span class="glyphicon glyphicon-home"></span></a>
+            </div>
+            <div class="navbar-collapse collapse">
+                @Html.Partial("_MenuPartial")
+                @Html.Partial("_LoginPartial")
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid body-content">
+        <div class="hidden-print">
+            @if (title != null)
+            {
+                <h2>@Html.DisplayFor(_ => title)</h2>
+            }
+            else
+            {
+                title = "todo: заглавие";
+                <em>@title</em>
+            }
+            <h4>@RenderSection("Subtitle", required: false)</h4>
+            @Html.Action("AlertsPartial", "Home", new { area = string.Empty })
+        </div>
+        @RenderBody()
+        <hr />
+        <footer>
+            <div class="row">
+                <div class="col-md-4 col-md-offset-2">
+                    <img src="~/Content/Images/eu_esf.png" class="img-responsive" />
+                </div>
+                <div class="col-md-4 col-md-offset-1">
+                    <img src="~/Content/Images/logo-bg-right-no-back.png" class="img-responsive" />
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="container-fluid">
+                    <p class="pull-left"> &copy; @DateTime.Now.Year - Трансформация на модела на административно обслужване </p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    <script src="~/Scripts/init.js"></script>
+    <script src="~/Scripts/app.js"></script>
+    @RenderSection("scripts", required: false)
+</body>
+</html>

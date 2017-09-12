@@ -1,0 +1,1109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="ReguxModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Administration">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Code" Type="varchar" MaxLength="100" />
+          <Property Name="ParentId" Type="int" />
+          <Property Name="Name" Type="nvarchar" MaxLength="1000" Nullable="false" />
+          <Property Name="Certificate" Type="varbinary(max)" />
+          <Property Name="ProposedCertificate" Type="varbinary(max)" />
+          <Property Name="CertificatePassword" Type="nvarchar" MaxLength="100" />
+          <Property Name="ProposedCertificatePassword" Type="nvarchar" MaxLength="100" />
+        </EntityType>
+        <EntityType Name="AspNetRoles">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="256" Nullable="false" />
+        </EntityType>
+        <EntityType Name="AspNetUserRoles">
+          <Key>
+            <PropertyRef Name="UserId" />
+            <PropertyRef Name="RoleId" />
+          </Key>
+          <Property Name="UserId" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="RoleId" Type="nvarchar" MaxLength="128" Nullable="false" />
+        </EntityType>
+        <EntityType Name="AspNetUsers">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="Email" Type="nvarchar" MaxLength="256" />
+          <Property Name="EmailConfirmed" Type="bit" Nullable="false" />
+          <Property Name="PasswordHash" Type="nvarchar(max)" />
+          <Property Name="SecurityStamp" Type="nvarchar(max)" />
+          <Property Name="PhoneNumber" Type="nvarchar(max)" />
+          <Property Name="PhoneNumberConfirmed" Type="bit" Nullable="false" />
+          <Property Name="TwoFactorEnabled" Type="bit" Nullable="false" />
+          <Property Name="LockoutEndDateUtc" Type="datetime" />
+          <Property Name="LockoutEnabled" Type="bit" Nullable="false" />
+          <Property Name="AccessFailedCount" Type="int" Nullable="false" />
+          <Property Name="UserName" Type="nvarchar" MaxLength="256" Nullable="false" />
+          <Property Name="PersonName" Type="nvarchar(max)" />
+          <Property Name="ChangePassword" Type="bit" Nullable="false" />
+          <Property Name="Certificate" Type="varbinary(max)" />
+        </EntityType>
+        <EntityType Name="Audit">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="UserID" Type="nvarchar" MaxLength="128" />
+          <Property Name="TimeAccessed" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="IPAddress" Type="nvarchar" MaxLength="100" />
+          <Property Name="URL" Type="nvarchar" MaxLength="1000" />
+          <Property Name="Data" Type="nvarchar(max)" />
+          <Property Name="Activity" Type="nvarchar(max)" />
+          <Property Name="Duration" Type="bigint" />
+          <Property Name="UserName" Type="nvarchar" MaxLength="450" />
+          <Property Name="Controller" Type="nvarchar" MaxLength="1000" />
+          <Property Name="Action" Type="nvarchar" MaxLength="1000" />
+          <Property Name="SessionID" Type="nvarchar" MaxLength="1000" />
+          <Property Name="RequestMethod" Type="nvarchar" MaxLength="100" />
+        </EntityType>
+        <EntityType Name="Request">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="UserId" Type="nvarchar" MaxLength="128" />
+          <Property Name="ServiceId" Type="int" Nullable="false" />
+          <Property Name="Argument" Type="xml" />
+          <Property Name="CallContext" Type="xml" />
+          <Property Name="DraftDateTime" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="StartDateTime" Type="datetime2" Precision="7" />
+          <Property Name="EndDateTime" Type="datetime2" Precision="7" />
+          <Property Name="DeleteDateTime" Type="datetime2" Precision="7" />
+          <Property Name="Error" Type="nvarchar(max)" />
+        </EntityType>
+        <EntityType Name="Response">
+          <Key>
+            <PropertyRef Name="RequestId" />
+          </Key>
+          <Property Name="RequestId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Document" Type="xml" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Service">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="RegiXOperation" Type="varchar" MaxLength="200" />
+          <Property Name="AdministrationId" Type="int" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="1000" />
+          <Property Name="LegalBasis" Type="nvarchar(max)" />
+          <Property Name="Category" Type="nvarchar" MaxLength="1000" />
+          <Property Name="RegimeType" Type="nvarchar" MaxLength="100" />
+          <Property Name="IsEu" Type="bit" Nullable="false" />
+          <Property Name="IsInternal" Type="bit" Nullable="false" />
+          <Property Name="IsRegime" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ServiceStep">
+          <Key>
+            <PropertyRef Name="ParentId" />
+            <PropertyRef Name="StepNumber" />
+          </Key>
+          <Property Name="ParentId" Type="int" Nullable="false" />
+          <Property Name="StepNumber" Type="tinyint" Nullable="false" />
+          <Property Name="ChildId" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="UserLocalRole">
+          <Key>
+            <PropertyRef Name="UserId" />
+            <PropertyRef Name="AdministrationId" />
+          </Key>
+          <Property Name="UserId" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="AdministrationId" Type="int" Nullable="false" />
+          <Property Name="LocalRoleCode" Type="varchar" MaxLength="20" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Config">
+          <Key>
+            <PropertyRef Name="Code" />
+          </Key>
+          <Property Name="Code" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="Value" Type="nvarchar(max)" />
+        </EntityType>
+        <EntityType Name="LocalRole">
+          <Key>
+            <PropertyRef Name="Code" />
+          </Key>
+          <Property Name="Code" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="100" Nullable="false" />
+        </EntityType>
+        <EntityType Name="PidType">
+          <Key>
+            <PropertyRef Name="Code" />
+          </Key>
+          <Property Name="Code" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="100" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Signal">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="SubmitDateTime" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="IncidentDateTime" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="ServiceId" Type="int" Nullable="false" />
+          <Property Name="EmployeeId" Type="nvarchar" MaxLength="128" />
+          <Property Name="EmployeeName" Type="nvarchar" MaxLength="100" />
+          <Property Name="SenderPidTypeCode" Type="varchar" MaxLength="20" />
+          <Property Name="SenderIdentifier" Type="varchar" MaxLength="20" />
+          <Property Name="SenderContact" Type="nvarchar(max)" />
+          <Property Name="SenderNote" Type="nvarchar(max)" />
+          <Property Name="AdministrationId" Type="int" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_Administration_Parent">
+          <End Role="Administration" Type="Self.Administration" Multiplicity="0..1" />
+          <End Role="Administration1" Type="Self.Administration" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Administration">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Administration1">
+              <PropertyRef Name="ParentId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Audit_AspNetUsers">
+          <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="0..1" />
+          <End Role="Audit" Type="Self.Audit" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AspNetUsers">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Audit">
+              <PropertyRef Name="UserID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dbo_AspNetUserRoles_dbo_AspNetRoles_RoleId">
+          <End Role="AspNetRoles" Type="Self.AspNetRoles" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="AspNetUserRoles" Type="Self.AspNetUserRoles" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AspNetRoles">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="AspNetUserRoles">
+              <PropertyRef Name="RoleId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dbo_AspNetUserRoles_dbo_AspNetUsers_UserId">
+          <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="AspNetUserRoles" Type="Self.AspNetUserRoles" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AspNetUsers">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="AspNetUserRoles">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Request_AspNetUsers">
+          <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="0..1" />
+          <End Role="Request" Type="Self.Request" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AspNetUsers">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Request">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Request_Service">
+          <End Role="Service" Type="Self.Service" Multiplicity="1" />
+          <End Role="Request" Type="Self.Request" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Service">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Request">
+              <PropertyRef Name="ServiceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Response_Request">
+          <End Role="Request" Type="Self.Request" Multiplicity="1" />
+          <End Role="Response" Type="Self.Response" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="Request">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Response">
+              <PropertyRef Name="RequestId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Service_Administration">
+          <End Role="Administration" Type="Self.Administration" Multiplicity="1" />
+          <End Role="Service" Type="Self.Service" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Administration">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Service">
+              <PropertyRef Name="AdministrationId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ServiceStep_Child">
+          <End Role="Service" Type="Self.Service" Multiplicity="1" />
+          <End Role="ServiceStep" Type="Self.ServiceStep" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Service">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ServiceStep">
+              <PropertyRef Name="ChildId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ServiceStep_Parent">
+          <End Role="Service" Type="Self.Service" Multiplicity="1" />
+          <End Role="ServiceStep" Type="Self.ServiceStep" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Service">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ServiceStep">
+              <PropertyRef Name="ParentId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Signal_Administration">
+          <End Role="Administration" Type="Self.Administration" Multiplicity="1" />
+          <End Role="Signal" Type="Self.Signal" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Administration">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Signal">
+              <PropertyRef Name="AdministrationId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Signal_AspNetUsers">
+          <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="0..1" />
+          <End Role="Signal" Type="Self.Signal" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AspNetUsers">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Signal">
+              <PropertyRef Name="EmployeeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Signal_PidType">
+          <End Role="PidType" Type="Self.PidType" Multiplicity="0..1" />
+          <End Role="Signal" Type="Self.Signal" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PidType">
+              <PropertyRef Name="Code" />
+            </Principal>
+            <Dependent Role="Signal">
+              <PropertyRef Name="SenderPidTypeCode" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Signal_Service">
+          <End Role="Service" Type="Self.Service" Multiplicity="1" />
+          <End Role="Signal" Type="Self.Signal" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Service">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Signal">
+              <PropertyRef Name="ServiceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UserLocalRole_Administration">
+          <End Role="Administration" Type="Self.Administration" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="UserLocalRole" Type="Self.UserLocalRole" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Administration">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="UserLocalRole">
+              <PropertyRef Name="AdministrationId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UserLocalRole_AspNetUsers">
+          <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="UserLocalRole" Type="Self.UserLocalRole" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AspNetUsers">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="UserLocalRole">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UserLocalRole_LocalRole">
+          <End Role="LocalRole" Type="Self.LocalRole" Multiplicity="1" />
+          <End Role="UserLocalRole" Type="Self.UserLocalRole" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="LocalRole">
+              <PropertyRef Name="Code" />
+            </Principal>
+            <Dependent Role="UserLocalRole">
+              <PropertyRef Name="LocalRoleCode" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="ReguxModelStoreContainer">
+          <EntitySet Name="Administration" EntityType="Self.Administration" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="AspNetRoles" EntityType="Self.AspNetRoles" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="AspNetUserRoles" EntityType="Self.AspNetUserRoles" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="AspNetUsers" EntityType="Self.AspNetUsers" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Audit" EntityType="Self.Audit" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Request" EntityType="Self.Request" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Response" EntityType="Self.Response" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Service" EntityType="Self.Service" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ServiceStep" EntityType="Self.ServiceStep" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="UserLocalRole" EntityType="Self.UserLocalRole" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Config" EntityType="Self.Config" Schema="N" store:Type="Tables" />
+          <EntitySet Name="LocalRole" EntityType="Self.LocalRole" Schema="N" store:Type="Tables" />
+          <EntitySet Name="PidType" EntityType="Self.PidType" Schema="N" store:Type="Tables" />
+          <EntitySet Name="Signal" EntityType="Self.Signal" Schema="Pub" store:Type="Tables" />
+          <AssociationSet Name="FK_Administration_Parent" Association="Self.FK_Administration_Parent">
+            <End Role="Administration" EntitySet="Administration" />
+            <End Role="Administration1" EntitySet="Administration" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Audit_AspNetUsers" Association="Self.FK_Audit_AspNetUsers">
+            <End Role="AspNetUsers" EntitySet="AspNetUsers" />
+            <End Role="Audit" EntitySet="Audit" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dbo_AspNetUserRoles_dbo_AspNetRoles_RoleId" Association="Self.FK_dbo_AspNetUserRoles_dbo_AspNetRoles_RoleId">
+            <End Role="AspNetRoles" EntitySet="AspNetRoles" />
+            <End Role="AspNetUserRoles" EntitySet="AspNetUserRoles" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dbo_AspNetUserRoles_dbo_AspNetUsers_UserId" Association="Self.FK_dbo_AspNetUserRoles_dbo_AspNetUsers_UserId">
+            <End Role="AspNetUsers" EntitySet="AspNetUsers" />
+            <End Role="AspNetUserRoles" EntitySet="AspNetUserRoles" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Request_AspNetUsers" Association="Self.FK_Request_AspNetUsers">
+            <End Role="AspNetUsers" EntitySet="AspNetUsers" />
+            <End Role="Request" EntitySet="Request" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Request_Service" Association="Self.FK_Request_Service">
+            <End Role="Service" EntitySet="Service" />
+            <End Role="Request" EntitySet="Request" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Response_Request" Association="Self.FK_Response_Request">
+            <End Role="Request" EntitySet="Request" />
+            <End Role="Response" EntitySet="Response" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Service_Administration" Association="Self.FK_Service_Administration">
+            <End Role="Administration" EntitySet="Administration" />
+            <End Role="Service" EntitySet="Service" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ServiceStep_Child" Association="Self.FK_ServiceStep_Child">
+            <End Role="Service" EntitySet="Service" />
+            <End Role="ServiceStep" EntitySet="ServiceStep" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ServiceStep_Parent" Association="Self.FK_ServiceStep_Parent">
+            <End Role="Service" EntitySet="Service" />
+            <End Role="ServiceStep" EntitySet="ServiceStep" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Signal_Administration" Association="Self.FK_Signal_Administration">
+            <End Role="Administration" EntitySet="Administration" />
+            <End Role="Signal" EntitySet="Signal" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Signal_AspNetUsers" Association="Self.FK_Signal_AspNetUsers">
+            <End Role="AspNetUsers" EntitySet="AspNetUsers" />
+            <End Role="Signal" EntitySet="Signal" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Signal_PidType" Association="Self.FK_Signal_PidType">
+            <End Role="PidType" EntitySet="PidType" />
+            <End Role="Signal" EntitySet="Signal" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Signal_Service" Association="Self.FK_Signal_Service">
+            <End Role="Service" EntitySet="Service" />
+            <End Role="Signal" EntitySet="Signal" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UserLocalRole_Administration" Association="Self.FK_UserLocalRole_Administration">
+            <End Role="Administration" EntitySet="Administration" />
+            <End Role="UserLocalRole" EntitySet="UserLocalRole" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UserLocalRole_AspNetUsers" Association="Self.FK_UserLocalRole_AspNetUsers">
+            <End Role="AspNetUsers" EntitySet="AspNetUsers" />
+            <End Role="UserLocalRole" EntitySet="UserLocalRole" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UserLocalRole_LocalRole" Association="Self.FK_UserLocalRole_LocalRole">
+            <End Role="LocalRole" EntitySet="LocalRole" />
+            <End Role="UserLocalRole" EntitySet="UserLocalRole" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="ReguxModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="AspNetUser">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Email" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
+          <Property Name="EmailConfirmed" Type="Boolean" Nullable="false" />
+          <Property Name="PasswordHash" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="SecurityStamp" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="PhoneNumber" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="PhoneNumberConfirmed" Type="Boolean" Nullable="false" />
+          <Property Name="TwoFactorEnabled" Type="Boolean" Nullable="false" />
+          <Property Name="LockoutEndDateUtc" Type="DateTime" Precision="3" />
+          <Property Name="LockoutEnabled" Type="Boolean" Nullable="false" />
+          <Property Name="AccessFailedCount" Type="Int32" Nullable="false" />
+          <Property Name="UserName" Type="String" MaxLength="256" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Requests" Relationship="ReguxModel.FK_Request_AspNetUsers" FromRole="AspNetUser" ToRole="Request" />
+          <NavigationProperty Name="Signals" Relationship="ReguxModel.FK_Signal_AspNetUsers" FromRole="AspNetUser" ToRole="Signal" />
+          <Property Name="PersonName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="UserLocalRoles" Relationship="ReguxModel.FK_UserLocalRole_AspNetUsers" FromRole="AspNetUser" ToRole="UserLocalRole" />
+          <NavigationProperty Name="AspNetRoles" Relationship="ReguxModel.AspNetUserRoles" FromRole="AspNetUser" ToRole="AspNetRole" />
+          <NavigationProperty Name="Audits" Relationship="ReguxModel.FK_Audit_AspNetUsers" FromRole="AspNetUser" ToRole="Audit" />
+          <Property Name="ChangePassword" Type="Boolean" Nullable="false" />
+          <Property Name="Certificate" Type="Binary" MaxLength="Max" FixedLength="false" />
+        </EntityType>
+        <EntityContainer Name="ReguxEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="AspNetUsers" EntityType="Self.AspNetUser" />
+          <EntitySet Name="Requests" EntityType="ReguxModel.Request" />
+          <EntitySet Name="Responses" EntityType="ReguxModel.Response" />
+          <EntitySet Name="ServiceSteps" EntityType="ReguxModel.ServiceStep" />
+          <EntitySet Name="Configs" EntityType="ReguxModel.Config" />
+          <EntitySet Name="PidTypes" EntityType="ReguxModel.PidType" />
+          <EntitySet Name="Signals" EntityType="ReguxModel.Signal" />
+          <AssociationSet Name="FK_Request_AspNetUsers" Association="ReguxModel.FK_Request_AspNetUsers">
+            <End Role="AspNetUser" EntitySet="AspNetUsers" />
+            <End Role="Request" EntitySet="Requests" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Signal_AspNetUsers" Association="ReguxModel.FK_Signal_AspNetUsers">
+            <End Role="AspNetUser" EntitySet="AspNetUsers" />
+            <End Role="Signal" EntitySet="Signals" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Response_Request" Association="ReguxModel.FK_Response_Request">
+            <End Role="Request" EntitySet="Requests" />
+            <End Role="Response" EntitySet="Responses" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Signal_PidType" Association="ReguxModel.FK_Signal_PidType">
+            <End Role="PidType" EntitySet="PidTypes" />
+            <End Role="Signal" EntitySet="Signals" />
+          </AssociationSet>
+          <EntitySet Name="Services" EntityType="ReguxModel.Service" />
+          <AssociationSet Name="FK_Request_Service" Association="ReguxModel.FK_Request_Service">
+            <End Role="Service" EntitySet="Services" />
+            <End Role="Request" EntitySet="Requests" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ServiceStep_Child" Association="ReguxModel.FK_ServiceStep_Child">
+            <End Role="Service" EntitySet="Services" />
+            <End Role="ServiceStep" EntitySet="ServiceSteps" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ServiceStep_Parent" Association="ReguxModel.FK_ServiceStep_Parent">
+            <End Role="Service" EntitySet="Services" />
+            <End Role="ServiceStep" EntitySet="ServiceSteps" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Signal_Service" Association="ReguxModel.FK_Signal_Service">
+            <End Role="Service" EntitySet="Services" />
+            <End Role="Signal" EntitySet="Signals" />
+          </AssociationSet>
+          <EntitySet Name="Administrations" EntityType="ReguxModel.Administration" />
+          <AssociationSet Name="FK_Administration_Parent" Association="ReguxModel.FK_Administration_Parent">
+            <End Role="Administration" EntitySet="Administrations" />
+            <End Role="Administration1" EntitySet="Administrations" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Service_Administration" Association="ReguxModel.FK_Service_Administration">
+            <End Role="Administration" EntitySet="Administrations" />
+            <End Role="Service" EntitySet="Services" />
+          </AssociationSet>
+          <EntitySet Name="UserLocalRoles" EntityType="ReguxModel.UserLocalRole" />
+          <EntitySet Name="LocalRoles" EntityType="ReguxModel.LocalRole" />
+          <AssociationSet Name="FK_UserLocalRole_Administration" Association="ReguxModel.FK_UserLocalRole_Administration">
+            <End Role="Administration" EntitySet="Administrations" />
+            <End Role="UserLocalRole" EntitySet="UserLocalRoles" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UserLocalRole_AspNetUsers" Association="ReguxModel.FK_UserLocalRole_AspNetUsers">
+            <End Role="AspNetUser" EntitySet="AspNetUsers" />
+            <End Role="UserLocalRole" EntitySet="UserLocalRoles" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UserLocalRole_LocalRole" Association="ReguxModel.FK_UserLocalRole_LocalRole">
+            <End Role="LocalRole" EntitySet="LocalRoles" />
+            <End Role="UserLocalRole" EntitySet="UserLocalRoles" />
+          </AssociationSet>
+          <EntitySet Name="AspNetRoles" EntityType="ReguxModel.AspNetRole" />
+          <AssociationSet Name="AspNetUserRoles" Association="ReguxModel.AspNetUserRoles">
+            <End Role="AspNetRole" EntitySet="AspNetRoles" />
+            <End Role="AspNetUser" EntitySet="AspNetUsers" />
+          </AssociationSet>
+          <EntitySet Name="Audits" EntityType="ReguxModel.Audit" />
+          <AssociationSet Name="FK_Audit_AspNetUsers" Association="ReguxModel.FK_Audit_AspNetUsers">
+            <End Role="AspNetUser" EntitySet="AspNetUsers" />
+            <End Role="Audit" EntitySet="Audits" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Signal_Administration" Association="ReguxModel.FK_Signal_Administration">
+            <End Role="Administration" EntitySet="Administrations" />
+            <End Role="Signal" EntitySet="Signals" />
+          </AssociationSet>
+          </EntityContainer>
+        <EntityType Name="Request">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="UserId" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="ServiceId" Type="Int32" Nullable="false" />
+          <Property Name="Argument" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="CallContext" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="DraftDateTime" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="StartDateTime" Type="DateTime" Precision="7" />
+          <Property Name="EndDateTime" Type="DateTime" Precision="7" />
+          <Property Name="DeleteDateTime" Type="DateTime" Precision="7" />
+          <Property Name="Error" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="AspNetUser" Relationship="ReguxModel.FK_Request_AspNetUsers" FromRole="Request" ToRole="AspNetUser" />
+          <NavigationProperty Name="Response" Relationship="ReguxModel.FK_Response_Request" FromRole="Request" ToRole="Response" />
+          <NavigationProperty Name="Service" Relationship="ReguxModel.FK_Request_Service" FromRole="Request" ToRole="Service" />
+        </EntityType>
+        <EntityType Name="Response">
+          <Key>
+            <PropertyRef Name="RequestId" />
+          </Key>
+          <Property Name="RequestId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Document" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Request" Relationship="ReguxModel.FK_Response_Request" FromRole="Response" ToRole="Request" />
+        </EntityType>
+        <EntityType Name="ServiceStep">
+          <Key>
+            <PropertyRef Name="ParentId" />
+            <PropertyRef Name="StepNumber" />
+          </Key>
+          <Property Name="ParentId" Type="Int32" Nullable="false" />
+          <Property Name="StepNumber" Type="Byte" Nullable="false" />
+          <Property Name="ChildId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Children" Relationship="ReguxModel.FK_ServiceStep_Child" FromRole="ServiceStep" ToRole="Service" />
+          <NavigationProperty Name="Parent" Relationship="ReguxModel.FK_ServiceStep_Parent" FromRole="ServiceStep" ToRole="Service" />
+          </EntityType>
+        <EntityType Name="Config">
+          <Key>
+            <PropertyRef Name="Code" />
+          </Key>
+          <Property Name="Code" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Value" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="PidType">
+          <Key>
+            <PropertyRef Name="Code" />
+          </Key>
+          <Property Name="Code" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Signals" Relationship="ReguxModel.FK_Signal_PidType" FromRole="PidType" ToRole="Signal" />
+        </EntityType>
+        <EntityType Name="Signal">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SubmitDateTime" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="IncidentDateTime" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="ServiceId" Type="Int32" Nullable="false" />
+          <Property Name="EmployeeId" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="EmployeeName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="SenderPidTypeCode" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="SenderIdentifier" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="SenderContact" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="AspNetUser" Relationship="ReguxModel.FK_Signal_AspNetUsers" FromRole="Signal" ToRole="AspNetUser" />
+          <NavigationProperty Name="PidType" Relationship="ReguxModel.FK_Signal_PidType" FromRole="Signal" ToRole="PidType" />
+          <Property Name="SenderNote" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Service" Relationship="ReguxModel.FK_Signal_Service" FromRole="Signal" ToRole="Service" />
+          <Property Name="AdministrationId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Administration" Relationship="ReguxModel.FK_Signal_Administration" FromRole="Signal" ToRole="Administration" />
+        </EntityType>
+        <Association Name="FK_Request_AspNetUsers">
+          <End Type="ReguxModel.AspNetUser" Role="AspNetUser" Multiplicity="0..1" />
+          <End Type="ReguxModel.Request" Role="Request" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AspNetUser">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Request">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Signal_AspNetUsers">
+          <End Type="ReguxModel.AspNetUser" Role="AspNetUser" Multiplicity="0..1" />
+          <End Type="ReguxModel.Signal" Role="Signal" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AspNetUser">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Signal">
+              <PropertyRef Name="EmployeeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Response_Request">
+          <End Type="ReguxModel.Request" Role="Request" Multiplicity="1" />
+          <End Type="ReguxModel.Response" Role="Response" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="Request">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Response">
+              <PropertyRef Name="RequestId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Signal_PidType">
+          <End Type="ReguxModel.PidType" Role="PidType" Multiplicity="0..1" />
+          <End Type="ReguxModel.Signal" Role="Signal" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PidType">
+              <PropertyRef Name="Code" />
+            </Principal>
+            <Dependent Role="Signal">
+              <PropertyRef Name="SenderPidTypeCode" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="Service">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="RegiXOperation" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="AdministrationId" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="LegalBasis" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Category" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="RegimeType" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="IsEu" Type="Boolean" Nullable="false" />
+          <Property Name="IsInternal" Type="Boolean" Nullable="false" />
+          <Property Name="IsRegime" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="Requests" Relationship="ReguxModel.FK_Request_Service" FromRole="Service" ToRole="Request" />
+          <NavigationProperty Name="ChildInServiceSteps" Relationship="ReguxModel.FK_ServiceStep_Child" FromRole="Service" ToRole="ServiceStep" />
+          <NavigationProperty Name="ParentInServiceSteps" Relationship="ReguxModel.FK_ServiceStep_Parent" FromRole="Service" ToRole="ServiceStep" />
+          <NavigationProperty Name="Signals" Relationship="ReguxModel.FK_Signal_Service" FromRole="Service" ToRole="Signal" />
+          <NavigationProperty Name="Administration" Relationship="ReguxModel.FK_Service_Administration" FromRole="Service" ToRole="Administration" />
+        </EntityType>
+        <Association Name="FK_Request_Service">
+          <End Type="ReguxModel.Service" Role="Service" Multiplicity="1" />
+          <End Type="ReguxModel.Request" Role="Request" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Service">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Request">
+              <PropertyRef Name="ServiceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ServiceStep_Child">
+          <End Type="ReguxModel.Service" Role="Service" Multiplicity="1" />
+          <End Type="ReguxModel.ServiceStep" Role="ServiceStep" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Service">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ServiceStep">
+              <PropertyRef Name="ChildId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ServiceStep_Parent">
+          <End Type="ReguxModel.Service" Role="Service" Multiplicity="1" />
+          <End Type="ReguxModel.ServiceStep" Role="ServiceStep" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Service">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ServiceStep">
+              <PropertyRef Name="ParentId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Signal_Service">
+          <End Type="ReguxModel.Service" Role="Service" Multiplicity="1" />
+          <End Type="ReguxModel.Signal" Role="Signal" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Service">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Signal">
+              <PropertyRef Name="ServiceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="Administration">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Code" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="ParentId" Type="Int32" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Children" Relationship="ReguxModel.FK_Administration_Parent" FromRole="Administration" ToRole="Administration1" />
+          <NavigationProperty Name="Parent" Relationship="ReguxModel.FK_Administration_Parent" FromRole="Administration1" ToRole="Administration" />
+          <NavigationProperty Name="Services" Relationship="ReguxModel.FK_Service_Administration" FromRole="Administration" ToRole="Service" />
+          <NavigationProperty Name="UserLocalRoles" Relationship="ReguxModel.FK_UserLocalRole_Administration" FromRole="Administration" ToRole="UserLocalRole" />
+          <Property Name="Certificate" Type="Binary" MaxLength="Max" FixedLength="false" />
+          <Property Name="ProposedCertificate" Type="Binary" MaxLength="Max" FixedLength="false" />
+          <Property Name="CertificatePassword" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="ProposedCertificatePassword" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Signals" Relationship="ReguxModel.FK_Signal_Administration" FromRole="Administration" ToRole="Signal" />
+        </EntityType>
+        <Association Name="FK_Administration_Parent">
+          <End Type="ReguxModel.Administration" Role="Administration" Multiplicity="0..1" />
+          <End Type="ReguxModel.Administration" Role="Administration1" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Administration">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Administration1">
+              <PropertyRef Name="ParentId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Service_Administration">
+          <End Type="ReguxModel.Administration" Role="Administration" Multiplicity="1" />
+          <End Type="ReguxModel.Service" Role="Service" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Administration">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Service">
+              <PropertyRef Name="AdministrationId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="UserLocalRole">
+          <Key>
+            <PropertyRef Name="UserId" />
+            <PropertyRef Name="AdministrationId" />
+          </Key>
+          <Property Name="UserId" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="AdministrationId" Type="Int32" Nullable="false" />
+          <Property Name="LocalRoleCode" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Administration" Relationship="ReguxModel.FK_UserLocalRole_Administration" FromRole="UserLocalRole" ToRole="Administration" />
+          <NavigationProperty Name="AspNetUser" Relationship="ReguxModel.FK_UserLocalRole_AspNetUsers" FromRole="UserLocalRole" ToRole="AspNetUser" />
+          <NavigationProperty Name="LocalRole" Relationship="ReguxModel.FK_UserLocalRole_LocalRole" FromRole="UserLocalRole" ToRole="LocalRole" />
+        </EntityType>
+        <EntityType Name="LocalRole">
+          <Key>
+            <PropertyRef Name="Code" />
+          </Key>
+          <Property Name="Code" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="UserLocalRoles" Relationship="ReguxModel.FK_UserLocalRole_LocalRole" FromRole="LocalRole" ToRole="UserLocalRole" />
+        </EntityType>
+        <Association Name="FK_UserLocalRole_Administration">
+          <End Type="ReguxModel.Administration" Role="Administration" Multiplicity="1" />
+          <End Type="ReguxModel.UserLocalRole" Role="UserLocalRole" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Administration">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="UserLocalRole">
+              <PropertyRef Name="AdministrationId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UserLocalRole_AspNetUsers">
+          <End Type="ReguxModel.AspNetUser" Role="AspNetUser" Multiplicity="1" />
+          <End Type="ReguxModel.UserLocalRole" Role="UserLocalRole" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AspNetUser">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="UserLocalRole">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UserLocalRole_LocalRole">
+          <End Type="ReguxModel.LocalRole" Role="LocalRole" Multiplicity="1" />
+          <End Type="ReguxModel.UserLocalRole" Role="UserLocalRole" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="LocalRole">
+              <PropertyRef Name="Code" />
+            </Principal>
+            <Dependent Role="UserLocalRole">
+              <PropertyRef Name="LocalRoleCode" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="AspNetRole">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="256" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="AspNetUsers" Relationship="ReguxModel.AspNetUserRoles" FromRole="AspNetRole" ToRole="AspNetUser" />
+        </EntityType>
+        <Association Name="AspNetUserRoles">
+          <End Type="ReguxModel.AspNetRole" Role="AspNetRole" Multiplicity="*" />
+          <End Type="ReguxModel.AspNetUser" Role="AspNetUser" Multiplicity="*" />
+        </Association>
+        <EntityType Name="Audit">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="UserID" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="TimeAccessed" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="IPAddress" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="URL" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="Data" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Activity" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Duration" Type="Int64" />
+          <Property Name="UserName" Type="String" MaxLength="450" FixedLength="false" Unicode="true" />
+          <Property Name="Controller" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="Action" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="SessionID" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="RequestMethod" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="AspNetUser" Relationship="ReguxModel.FK_Audit_AspNetUsers" FromRole="Audit" ToRole="AspNetUser" />
+        </EntityType>
+        <Association Name="FK_Audit_AspNetUsers">
+          <End Type="ReguxModel.AspNetUser" Role="AspNetUser" Multiplicity="0..1" />
+          <End Type="ReguxModel.Audit" Role="Audit" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AspNetUser">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Audit">
+              <PropertyRef Name="UserID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Signal_Administration">
+          <End Type="ReguxModel.Administration" Role="Administration" Multiplicity="1" />
+          <End Type="ReguxModel.Signal" Role="Signal" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Administration">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Signal">
+              <PropertyRef Name="AdministrationId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="ReguxModelStoreContainer" CdmEntityContainer="ReguxEntities">
+          <EntitySetMapping Name="AspNetUsers">
+            <EntityTypeMapping TypeName="ReguxModel.AspNetUser">
+              <MappingFragment StoreEntitySet="AspNetUsers">
+                <ScalarProperty Name="Certificate" ColumnName="Certificate" />
+                <ScalarProperty Name="ChangePassword" ColumnName="ChangePassword" />
+                <ScalarProperty Name="PersonName" ColumnName="PersonName" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="EmailConfirmed" ColumnName="EmailConfirmed" />
+                <ScalarProperty Name="PasswordHash" ColumnName="PasswordHash" />
+                <ScalarProperty Name="SecurityStamp" ColumnName="SecurityStamp" />
+                <ScalarProperty Name="PhoneNumber" ColumnName="PhoneNumber" />
+                <ScalarProperty Name="PhoneNumberConfirmed" ColumnName="PhoneNumberConfirmed" />
+                <ScalarProperty Name="TwoFactorEnabled" ColumnName="TwoFactorEnabled" />
+                <ScalarProperty Name="LockoutEndDateUtc" ColumnName="LockoutEndDateUtc" />
+                <ScalarProperty Name="LockoutEnabled" ColumnName="LockoutEnabled" />
+                <ScalarProperty Name="AccessFailedCount" ColumnName="AccessFailedCount" />
+                <ScalarProperty Name="UserName" ColumnName="UserName" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Requests">
+            <EntityTypeMapping TypeName="ReguxModel.Request">
+              <MappingFragment StoreEntitySet="Request">
+                <ScalarProperty Name="Error" ColumnName="Error" />
+                <ScalarProperty Name="DeleteDateTime" ColumnName="DeleteDateTime" />
+                <ScalarProperty Name="EndDateTime" ColumnName="EndDateTime" />
+                <ScalarProperty Name="StartDateTime" ColumnName="StartDateTime" />
+                <ScalarProperty Name="DraftDateTime" ColumnName="DraftDateTime" />
+                <ScalarProperty Name="CallContext" ColumnName="CallContext" />
+                <ScalarProperty Name="Argument" ColumnName="Argument" />
+                <ScalarProperty Name="ServiceId" ColumnName="ServiceId" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Responses">
+            <EntityTypeMapping TypeName="ReguxModel.Response">
+              <MappingFragment StoreEntitySet="Response">
+                <ScalarProperty Name="Document" ColumnName="Document" />
+                <ScalarProperty Name="RequestId" ColumnName="RequestId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ServiceSteps">
+            <EntityTypeMapping TypeName="ReguxModel.ServiceStep">
+              <MappingFragment StoreEntitySet="ServiceStep">
+                <ScalarProperty Name="ChildId" ColumnName="ChildId" />
+                <ScalarProperty Name="StepNumber" ColumnName="StepNumber" />
+                <ScalarProperty Name="ParentId" ColumnName="ParentId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Configs">
+            <EntityTypeMapping TypeName="ReguxModel.Config">
+              <MappingFragment StoreEntitySet="Config">
+                <ScalarProperty Name="Value" ColumnName="Value" />
+                <ScalarProperty Name="Code" ColumnName="Code" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PidTypes">
+            <EntityTypeMapping TypeName="ReguxModel.PidType">
+              <MappingFragment StoreEntitySet="PidType">
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Code" ColumnName="Code" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Signals">
+            <EntityTypeMapping TypeName="ReguxModel.Signal">
+              <MappingFragment StoreEntitySet="Signal">
+                <ScalarProperty Name="AdministrationId" ColumnName="AdministrationId" />
+                <ScalarProperty Name="SenderNote" ColumnName="SenderNote" />
+                <ScalarProperty Name="SenderContact" ColumnName="SenderContact" />
+                <ScalarProperty Name="SenderIdentifier" ColumnName="SenderIdentifier" />
+                <ScalarProperty Name="SenderPidTypeCode" ColumnName="SenderPidTypeCode" />
+                <ScalarProperty Name="EmployeeName" ColumnName="EmployeeName" />
+                <ScalarProperty Name="EmployeeId" ColumnName="EmployeeId" />
+                <ScalarProperty Name="ServiceId" ColumnName="ServiceId" />
+                <ScalarProperty Name="IncidentDateTime" ColumnName="IncidentDateTime" />
+                <ScalarProperty Name="SubmitDateTime" ColumnName="SubmitDateTime" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Services">
+            <EntityTypeMapping TypeName="ReguxModel.Service">
+              <MappingFragment StoreEntitySet="Service">
+                <ScalarProperty Name="IsRegime" ColumnName="IsRegime" />
+                <ScalarProperty Name="IsInternal" ColumnName="IsInternal" />
+                <ScalarProperty Name="IsEu" ColumnName="IsEu" />
+                <ScalarProperty Name="RegimeType" ColumnName="RegimeType" />
+                <ScalarProperty Name="Category" ColumnName="Category" />
+                <ScalarProperty Name="LegalBasis" ColumnName="LegalBasis" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="AdministrationId" ColumnName="AdministrationId" />
+                <ScalarProperty Name="RegiXOperation" ColumnName="RegiXOperation" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Administrations">
+            <EntityTypeMapping TypeName="ReguxModel.Administration">
+              <MappingFragment StoreEntitySet="Administration">
+                <ScalarProperty Name="ProposedCertificatePassword" ColumnName="ProposedCertificatePassword" />
+                <ScalarProperty Name="CertificatePassword" ColumnName="CertificatePassword" />
+                <ScalarProperty Name="ProposedCertificate" ColumnName="ProposedCertificate" />
+                <ScalarProperty Name="Certificate" ColumnName="Certificate" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="ParentId" ColumnName="ParentId" />
+                <ScalarProperty Name="Code" ColumnName="Code" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="UserLocalRoles">
+            <EntityTypeMapping TypeName="ReguxModel.UserLocalRole">
+              <MappingFragment StoreEntitySet="UserLocalRole">
+                <ScalarProperty Name="LocalRoleCode" ColumnName="LocalRoleCode" />
+                <ScalarProperty Name="AdministrationId" ColumnName="AdministrationId" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="LocalRoles">
+            <EntityTypeMapping TypeName="ReguxModel.LocalRole">
+              <MappingFragment StoreEntitySet="LocalRole">
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Code" ColumnName="Code" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="AspNetRoles">
+            <EntityTypeMapping TypeName="ReguxModel.AspNetRole">
+              <MappingFragment StoreEntitySet="AspNetRoles">
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <AssociationSetMapping Name="AspNetUserRoles" TypeName="ReguxModel.AspNetUserRoles" StoreEntitySet="AspNetUserRoles">
+            <EndProperty Name="AspNetUser">
+              <ScalarProperty Name="Id" ColumnName="UserId" />
+            </EndProperty>
+            <EndProperty Name="AspNetRole">
+              <ScalarProperty Name="Id" ColumnName="RoleId" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <EntitySetMapping Name="Audits">
+            <EntityTypeMapping TypeName="ReguxModel.Audit">
+              <MappingFragment StoreEntitySet="Audit">
+                <ScalarProperty Name="RequestMethod" ColumnName="RequestMethod" />
+                <ScalarProperty Name="SessionID" ColumnName="SessionID" />
+                <ScalarProperty Name="Action" ColumnName="Action" />
+                <ScalarProperty Name="Controller" ColumnName="Controller" />
+                <ScalarProperty Name="UserName" ColumnName="UserName" />
+                <ScalarProperty Name="Duration" ColumnName="Duration" />
+                <ScalarProperty Name="Activity" ColumnName="Activity" />
+                <ScalarProperty Name="Data" ColumnName="Data" />
+                <ScalarProperty Name="URL" ColumnName="URL" />
+                <ScalarProperty Name="IPAddress" ColumnName="IPAddress" />
+                <ScalarProperty Name="TimeAccessed" ColumnName="TimeAccessed" />
+                <ScalarProperty Name="UserID" ColumnName="UserID" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

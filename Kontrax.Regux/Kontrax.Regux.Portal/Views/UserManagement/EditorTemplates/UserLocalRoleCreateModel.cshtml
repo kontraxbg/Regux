@@ -1,0 +1,14 @@
+﻿@model Kontrax.Regux.Model.UserManagement.UserLocalRoleCreateModel
+
+<div class="form-group">
+    @Html.LabelFor(model => model.AdministrationId, new { @class = "control-label col-md-2" })
+    <div class="col-md-4">
+        @Html.DropDownListFor(model => model.AdministrationId, new SelectList(Model.Administrations, "Id", "Name"), "---", new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.AdministrationId)
+    </div>
+    @Html.LabelFor(model => model.LocalRoleCode, new { @class = "control-label col-md-2" })
+    <div class="col-md-4">
+        @Html.DropDownListFor(model => model.LocalRoleCode, new SelectList(Model.LocalRoles, "Code", "Name"), "---", new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.LocalRoleCode)
+    </div>
+</div>

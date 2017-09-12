@@ -1,0 +1,57 @@
+﻿@{
+    ViewBag.Title = "Одит";
+}
+
+<link href="~/Content/MvcGrid/mvc-grid.css" rel="stylesheet" async />
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <div class="panel-title"><a data-toggle="collapse" href="#collapseMain">Филтър</a></div>
+    </div>
+    <div id="collapseMain" class="panel-collapse collapse">
+        <div class="panel-body form-horizontal">
+            <div class="form-group col-md-6">
+                <label class="col-md-6 control-label">От дата</label>
+                <div class="col-md-6">
+                    <input type="text" id="fromDate" date-picker-for="date" class="form-control"/>
+                </div>
+            </div>
+            <div class="form-group col-md-6">
+                <label class="col-md-6 control-label">До дата</label>
+                <div class="col-md-6">
+                    <input type="text" id="toDate" date-picker-for="date" class="form-control" />
+                </div>
+            </div>
+            <div class="form-group col-md-6">
+                <label class="col-md-6 control-label">Номер на сесия</label>
+                <div class="col-md-6">
+                    <input type="text" id="sessionID" class="form-control" />
+                </div>
+            </div>
+
+        </div>
+        <div class="panel-footer">
+            <button id="filterButton" class="btn btn-primary"><span class="glyphicon glyphicon-filter"></span> Филтрирай</button>
+        </div>
+    </div>
+</div>
+
+@Html.AjaxGrid(Url.Action("IndexGrid"))
+
+@section scripts{
+    <script src="~/Scripts/MvcGrid/mvc-grid.js"></script>
+    <script>
+        $(function () {
+            $('.mvc-grid').mvcgrid();
+        });
+
+        $('#filterButton').click(function () {
+            var grid = $('.mvc-grid').data('mvc-grid');
+            grid.query = 'fromDate=' + $('#fromDate').val() + '&toDate=' + $('#toDate').val() + '&sessionID=' + $('#sessionID').val();
+
+            $('.mvc-grid').mvcgrid({
+                reload: true
+            });
+        });
+    </script>
+}

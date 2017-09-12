@@ -1,0 +1,28 @@
+﻿@model Kontrax.Regux.Portal.Models.IndexViewModel
+@{
+    ViewBag.Title = "Manage";
+}
+
+@section Subtitle {
+    Change your account settings
+}
+
+<p class="text-success">@Model.StatusMessage</p>
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>Password:</dt>
+        <dd>
+            [
+            @if (Model.HasPassword)
+            {
+                @Html.ActionLink("Change your password", "ChangePassword")
+            }
+            else
+            {
+                @Html.ActionLink("Create", "SetPassword")
+            }
+            ]
+        </dd>
+    </dl>
+</div>

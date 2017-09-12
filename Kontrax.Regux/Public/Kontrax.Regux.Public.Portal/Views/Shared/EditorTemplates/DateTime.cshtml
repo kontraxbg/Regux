@@ -1,0 +1,15 @@
+﻿@model Nullable<DateTime>
+
+@{
+    //TODO - комбиниране на външните htmlAttributes с class = 'form-control'
+    Object viewDataHtmlAttributes = ViewData["htmlAttributes"];
+}
+
+<div class='input-group date datetimepicker2' style="padding: 0;">
+    @Html.TextBox("", (Model.HasValue ? Model.Value.ToString("dd/MM/yyyy HH:mm") : string.Empty),
+        viewDataHtmlAttributes != null ? viewDataHtmlAttributes : new { @class = "form-control" })
+    <span class="input-group-addon">
+        <span class="glyphicon glyphicon-calendar"></span>
+    </span>
+</div>
+

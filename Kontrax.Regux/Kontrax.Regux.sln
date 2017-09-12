@@ -1,0 +1,91 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.8
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kontrax.Regux.Portal", "Kontrax.Regux.Portal\Kontrax.Regux.Portal.csproj", "{1FEC4812-362D-461E-87EB-949C7CC4D11D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kontrax.Regux.Data", "Kontrax.Regux.Data\Kontrax.Regux.Data.csproj", "{48A424ED-0A41-48CC-B54C-7D15F465D5D7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kontrax.Regux.Model", "Kontrax.Regux.Model\Kontrax.Regux.Model.csproj", "{F3C84976-6E2B-4D26-A687-FD227809E900}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kontrax.Regux.Service", "Kontrax.Regux.Service\Kontrax.Regux.Service.csproj", "{451CF174-3A2C-4C95-8361-FE187FE4353B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Public", "Public", "{77634C04-C69E-4EB9-B5F5-586B7C4BCA0B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sql", "Sql", "{ED5857DA-1A75-435A-8809-E3AFB5959A21}"
+	ProjectSection(SolutionItems) = preProject
+		Sql\DbInit.sql = Sql\DbInit.sql
+		Sql\Elmah.sql = Sql\Elmah.sql
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kontrax.Regux.Public.Portal", "Public\Kontrax.Regux.Public.Portal\Kontrax.Regux.Public.Portal.csproj", "{227B3C8C-E642-4755-A5AB-0C927C23AC99}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kontrax.Regux.RegiXClient", "Kontrax.Regux.RegiXClient\Kontrax.Regux.RegiXClient.csproj", "{559A9EFF-FF51-49AE-8F7E-8B1ED997FDAD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1FEC4812-362D-461E-87EB-949C7CC4D11D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1FEC4812-362D-461E-87EB-949C7CC4D11D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1FEC4812-362D-461E-87EB-949C7CC4D11D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1FEC4812-362D-461E-87EB-949C7CC4D11D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{48A424ED-0A41-48CC-B54C-7D15F465D5D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48A424ED-0A41-48CC-B54C-7D15F465D5D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48A424ED-0A41-48CC-B54C-7D15F465D5D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48A424ED-0A41-48CC-B54C-7D15F465D5D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3C84976-6E2B-4D26-A687-FD227809E900}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3C84976-6E2B-4D26-A687-FD227809E900}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3C84976-6E2B-4D26-A687-FD227809E900}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3C84976-6E2B-4D26-A687-FD227809E900}.Release|Any CPU.Build.0 = Release|Any CPU
+		{451CF174-3A2C-4C95-8361-FE187FE4353B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{451CF174-3A2C-4C95-8361-FE187FE4353B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{451CF174-3A2C-4C95-8361-FE187FE4353B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{451CF174-3A2C-4C95-8361-FE187FE4353B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{227B3C8C-E642-4755-A5AB-0C927C23AC99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{227B3C8C-E642-4755-A5AB-0C927C23AC99}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{227B3C8C-E642-4755-A5AB-0C927C23AC99}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{227B3C8C-E642-4755-A5AB-0C927C23AC99}.Release|Any CPU.Build.0 = Release|Any CPU
+		{559A9EFF-FF51-49AE-8F7E-8B1ED997FDAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{559A9EFF-FF51-49AE-8F7E-8B1ED997FDAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{559A9EFF-FF51-49AE-8F7E-8B1ED997FDAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{559A9EFF-FF51-49AE-8F7E-8B1ED997FDAD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{227B3C8C-E642-4755-A5AB-0C927C23AC99} = {77634C04-C69E-4EB9-B5F5-586B7C4BCA0B}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5D3BFB57-347A-4203-993F-C19CE8F89BB1}
+	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 7
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = http://tfs:8080/tfs/defaultcollection
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = Kontrax.Regux.Portal\\Kontrax.Regux.Portal.csproj
+		SccProjectName1 = Kontrax.Regux.Portal
+		SccLocalPath1 = Kontrax.Regux.Portal
+		SccProjectUniqueName2 = Kontrax.Regux.Data\\Kontrax.Regux.Data.csproj
+		SccProjectName2 = Kontrax.Regux.Data
+		SccLocalPath2 = Kontrax.Regux.Data
+		SccProjectUniqueName3 = Kontrax.Regux.Model\\Kontrax.Regux.Model.csproj
+		SccProjectName3 = Kontrax.Regux.Model
+		SccLocalPath3 = Kontrax.Regux.Model
+		SccProjectUniqueName4 = Kontrax.Regux.Service\\Kontrax.Regux.Service.csproj
+		SccProjectName4 = Kontrax.Regux.Service
+		SccLocalPath4 = Kontrax.Regux.Service
+		SccProjectUniqueName5 = Public\\Kontrax.Regux.Public.Portal\\Kontrax.Regux.Public.Portal.csproj
+		SccProjectTopLevelParentUniqueName5 = Kontrax.Regux.sln
+		SccProjectName5 = Public/Kontrax.Regux.Public.Portal
+		SccLocalPath5 = Public\\Kontrax.Regux.Public.Portal
+		SccProjectUniqueName6 = Kontrax.Regux.RegiXClient\\Kontrax.Regux.RegiXClient.csproj
+		SccProjectName6 = Kontrax.Regux.RegiXClient
+		SccLocalPath6 = Kontrax.Regux.RegiXClient
+	EndGlobalSection
+EndGlobal

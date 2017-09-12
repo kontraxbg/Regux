@@ -1,0 +1,53 @@
+﻿@model Kontrax.Regux.Model.Admin.AdminIndexPageModel
+
+@{
+    ViewBag.Title = "Администриране на системата";
+}
+
+@section Subtitle {
+}
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="panel panel-info">
+            <div class="panel-heading">Сигурност</div>
+            <div class="panel-body">
+                <div class="btn-group-vertical col-md-12">
+                    @Html.ActionLink("Управление на потребителите", "Index", "UserManagement", null, new { @class = "btn btn-default" })
+                    @Html.ActionLink("Одит", "Index", "Audit", null, new { @class = "btn btn-default" })
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="panel panel-info">
+            <div class="panel-heading">Настройки</div>
+            <div class="panel-body">
+                <div class="btn-group-vertical col-md-12">
+                    @if (Model.IsGlobalAdmin)
+                    {
+                        @Html.ActionLink("Изпращане на електронна поща", "Smtp", "GlobalAdmin", null, new { @class = "btn btn-default" })
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="panel panel-info">
+            <div class="panel-heading">Номенклатури</div>
+            <div class="panel-body">
+                <div class="btn-group-vertical col-md-12">
+                    @if (Model.IsGlobalAdmin)
+                    {
+                        @Html.ActionLink("Администрации", "Index", "Administration", null, new { @class = "btn btn-default" })
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    
+

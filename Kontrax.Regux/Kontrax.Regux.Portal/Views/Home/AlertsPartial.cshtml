@@ -1,0 +1,14 @@
+﻿@using Kontrax.Regux.Portal.Controllers;
+@model IEnumerable<AlertUtil.AlertModel>
+
+@foreach (AlertUtil.AlertModel alert in Model)
+{
+    var dismissableClass = alert.IsDismissable ? "alert-dismissable" : null;
+    <div class="alert alert-@alert.AlertStyle @dismissableClass">
+        @if (alert.IsDismissable)
+        {
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+        }
+        @Html.Raw(alert.Message)
+    </div>
+}

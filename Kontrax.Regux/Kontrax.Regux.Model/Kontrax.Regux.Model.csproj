@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{F3C84976-6E2B-4D26-A687-FD227809E900}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Kontrax.Regux.Model</RootNamespace>
+    <AssemblyName>Kontrax.Regux.Model</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Administration\AdministrationEditModel.cs" />
+    <Compile Include="Administration\AdministrationIndexModel.cs" />
+    <Compile Include="Administration\AdministrationModel.cs" />
+    <Compile Include="Administration\AdministrationViewModel.cs" />
+    <Compile Include="Admin\AdminIndexPageModel.cs" />
+    <Compile Include="Audit\AuditModels.cs" />
+    <Compile Include="Call\ServicesModel.cs" />
+    <Compile Include="Config\SmtpConfig.cs" />
+    <Compile Include="GlobalAdmin\SmtpEditModel.cs" />
+    <Compile Include="CodeNameModel.cs" />
+    <Compile Include="IdNameModel.cs" />
+    <Compile Include="Call\XmlElementModel.cs" />
+    <Compile Include="Call\RequestFormModel.cs" />
+    <Compile Include="UserManagement\UserLocalRoleCreateModel.cs" />
+    <Compile Include="UserPermissionsModel.cs" />
+    <Compile Include="Call\RegiXTestModel.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Roles.cs" />
+    <Compile Include="UserManagement\UserCreateModel.cs" />
+    <Compile Include="UserManagement\UserBaseModel.cs" />
+    <Compile Include="UserManagement\UserLocalRoleEditModel.cs" />
+    <Compile Include="UserManagement\UserEditModel.cs" />
+    <Compile Include="UserManagement\UsersViewModel.cs" />
+    <Compile Include="UserManagement\UserViewModel.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

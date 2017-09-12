@@ -1,0 +1,42 @@
+﻿@model IEnumerable<Kontrax.Regux.Model.Audit.AuditViewModel>
+
+@(Html
+    .Grid(Model)
+    .Build(columns =>
+    {
+        columns.Add(m => m.TimeAccessed).Titled(Html.DisplayNameFor(model => model.First().TimeAccessed));
+        columns.Add(m => m.Duration).Titled(Html.DisplayNameFor(model => model.First().Duration));
+        columns.Add(m => m.IPAddress).Titled(Html.DisplayNameFor(model => model.First().IPAddress));
+        columns.Add(m => m.SessionID).Titled(Html.DisplayNameFor(model => model.First().SessionID))
+            .Encoded(false)
+            .RenderedAs(model => Html.Raw("<a href='#' class='filterBySession' data-id='" + model.SessionID + "'>" + model.SessionID + "</a>")
+            );
+        columns.Add(m => m.UserName).Titled(Html.DisplayNameFor(model => model.First().UserName));
+        columns.Add(m => m.URLAccessed).Titled(Html.DisplayNameFor(model => model.First().URLAccessed));
+        columns.Add(m => m.Activity).Titled(Html.DisplayNameFor(model => model.First().Activity));
+        columns.Add(m => m.ID).Titled("").Encoded(false).RenderedAs(model => Html.Raw("<a href=\"" + Url.Action("Details", new { id = model.ID }) + "\"><span class=\"glyphicon glyphicon-eye-open\" data-toggle=\"tooltip\" title=\"детайли\"></span></a>")).Filterable(false);
+    })
+    .Filterable()
+    .Sortable(true)
+    .Pageable(pager =>
+    {
+        pager.PagesToDisplay = 10;
+        pager.RowsPerPage = 10;
+    })
+    .Empty("Не са открити елементи")
+    .Css("table table-hover")
+)
+
+    <script>
+
+        $('.filterBySession').click(function () {
+            var grid = $('.mvc-grid').data('mvc-grid');
+            grid.query = 'fromDate=' + $('#fromDate').val() + '&toDate=' + $('#toDate').val() + '&sessionID=' + $(this).data("id");
+
+            $("#sessionID").val($(this).data("id"));
+
+            $('.mvc-grid').mvcgrid({
+                reload: true
+            });
+        });
+    </script>

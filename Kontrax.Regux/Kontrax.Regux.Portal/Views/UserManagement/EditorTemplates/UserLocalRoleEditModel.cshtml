@@ -1,0 +1,22 @@
+﻿@model Kontrax.Regux.Model.UserManagement.UserLocalRoleEditModel
+
+<div class="form-group">
+    @Html.LabelFor(model => model.AdministrationId, new { @class = "control-label col-md-2" })
+    <div class="col-md-4">
+        @Html.HiddenFor(model => model.AdministrationId)
+        <div class="form-control">@Html.DisplayFor(model => model.AdministrationName)</div>
+    </div>
+    @Html.LabelFor(model => model.LocalRoleCode, new { @class = "control-label col-md-2" })
+    <div class="col-md-4">
+        @if (Model.CanEditLocalRole)
+        {
+            @Html.DropDownListFor(model => model.LocalRoleCode, new SelectList(Model.LocalRoles, "Code", "Name"), "(изтриване)", new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.LocalRoleCode)
+        }
+        else
+        {
+            @Html.HiddenFor(model => model.LocalRoleCode)
+            <div class="form-control">@Html.DisplayFor(model => model.LocalRoleName)</div>
+        }
+    </div>
+</div>
