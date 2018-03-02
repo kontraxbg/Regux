@@ -1,31 +1,66 @@
 ﻿@{
-    ViewBag.Title = "Одит";
+    ViewBag.Title = "Журнал на действията";
+}
+
+@section Subtitle {
+    @Html.ActionLink("Назад към списъка със справки", "Index", "Report")
 }
 
 <link href="~/Content/MvcGrid/mvc-grid.css" rel="stylesheet" async />
 
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <div class="panel-title"><a data-toggle="collapse" href="#collapseMain">Филтър</a></div>
+<div class="panel panel-info">
+    <div class="panel-heading clearfix">
+        <div class="pull-right">
+            <a id="btnCheckAuditChain" class="btn btn-default"><i class="fa fa-check-square-o"></i> Проверка</a>
+            <a id="btnExport" class="btn btn-default"><i class="fa fa-file-excel-o"></i> Експорт</a>
+        </div>
+        <div class="panel-title pull-left"><a data-toggle="collapse" href="#collapseMain">Филтър</a></div>
     </div>
-    <div id="collapseMain" class="panel-collapse collapse">
+    <div id="collapseMain" class="panel-collapse collapse in">
         <div class="panel-body form-horizontal">
+            @{
+                Kontrax.Regux.Model.Audit.AuditSearchModel searchModel = null;
+            }
+
             <div class="form-group col-md-6">
-                <label class="col-md-6 control-label">От дата</label>
+                @Html.LabelFor(_ => searchModel.FromDate, htmlAttributes: new { @class = "control-label col-md-6" })
                 <div class="col-md-6">
-                    <input type="text" id="fromDate" date-picker-for="date" class="form-control"/>
+                    @Html.EditorFor(_ => searchModel.FromDate, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(_ => searchModel.FromDate, "", new { @class = "text-danger" })
                 </div>
             </div>
+
             <div class="form-group col-md-6">
-                <label class="col-md-6 control-label">До дата</label>
+                @Html.LabelFor(_ => searchModel.ToDate, htmlAttributes: new { @class = "control-label col-md-6" })
                 <div class="col-md-6">
-                    <input type="text" id="toDate" date-picker-for="date" class="form-control" />
+                    @Html.EditorFor(_ => searchModel.ToDate, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(_ => searchModel.ToDate, "", new { @class = "text-danger" })
                 </div>
             </div>
+
             <div class="form-group col-md-6">
                 <label class="col-md-6 control-label">Номер на сесия</label>
                 <div class="col-md-6">
-                    <input type="text" id="sessionID" class="form-control" />
+                    <input type="text" id="sessionId" class="form-control" />
+                </div>
+            </div>
+            <div class="form-group col-md-6">
+                <label class="col-md-6 control-label">Потребител</label>
+                <div class="col-md-6">
+                    <input type="text" id="userName" class="form-control" />
+                </div>
+            </div>
+            <div class="form-group col-md-6">
+                <label class="col-md-6 control-label">Вид</label>
+                <div class="col-md-6">
+                    <select id="auditType" class="form-control select2-search-select" multiple="multiple">
+                        @*<option value="0">Всички</option>*@
+                        @foreach (var state in Enum.GetValues(typeof(Kontrax.Regux.Model.Audit.AuditTypeCode)))
+                        {
+                            <option>@Enum.GetName(typeof(Kontrax.Regux.Model.Audit.AuditTypeCode), state)</option>
+                        }
+                    </select>
+
                 </div>
             </div>
 
@@ -39,19 +74,79 @@
 @Html.AjaxGrid(Url.Action("IndexGrid"))
 
 @section scripts{
+    @Scripts.Render("~/bundles/jqueryval")
+
     <script src="~/Scripts/MvcGrid/mvc-grid.js"></script>
     <script>
+        $("#btnCheckAuditChain").click(function () {
+            var grid = $('.mvc-grid').data('mvc-grid');
+            window.location = app.mvcActionUrl('CheckAuditChain', 'Audit');
+            // TODO - ако може, да се направи да се POST-ват и датите от филтрите
+            // може и така - ама се мотат в урл-то и е грозно, а и не се сменят, ако на следващият екран избереш други дати
+            // + '?fromDate=' + $('#searchModel_FromDate').val() + '&toDate=' + $('#searchModel_ToDate').val();
+        });
+
+        $("#btnExport").click(function () {
+            var grid = $('.mvc-grid').data('mvc-grid');
+            window.location = app.mvcActionUrl('ExportIndex', 'Audit') + '?' + serialize(grid.data);
+        });
+
         $(function () {
             $('.mvc-grid').mvcgrid();
-        });
+            //$('#fromDateGroup').datetimepicker({ locale: 'bg' });
+            //$('#toDateGroup').datetimepicker({
+            //    locale: 'bg',
+            //    useCurrent: false //Important! See issue #1075
+            //});
 
-        $('#filterButton').click(function () {
-            var grid = $('.mvc-grid').data('mvc-grid');
-            grid.query = 'fromDate=' + $('#fromDate').val() + '&toDate=' + $('#toDate').val() + '&sessionID=' + $('#sessionID').val();
-
-            $('.mvc-grid').mvcgrid({
-                reload: true
+            //$("#fromDateGroup").on("dp.change", function (e) {
+            //    $('#toDateGroup').data("DateTimePicker").minDate(e.date);
+            //});
+            $("#searchModel_FromDate").parent().on("dp.change", function (e) {
+                $('#searchModel_ToDate').parent().data("DateTimePicker").minDate(e.date);
+            });
+            $("#searchModel_ToDate").parent().on("dp.change", function (e) {
+                $('#searchModel_FromDate').parent().data("DateTimePicker").maxDate(e.date);
             });
         });
+
+        $('#filterButton').click(filterData);
+
+        function filterData() {
+            var grid = $('.mvc-grid').data('mvc-grid');
+            //grid.query = 'fromDate=' + $('#searchModel_FromDate').val() + '&toDate=' + $('#toDate').val() + '&sessionId=' + $('#sessionId').val() + '&userName=' + $('#userName').val() + '&auditType=' + $('#auditType').val();
+
+            $('.mvc-grid').mvcgrid({
+                requestType: 'post',
+                reload: true,
+                data: {
+                    //fromDate: $('#searchModel_FromDate').val(),
+                    //toDate: $('#searchModel_ToDate').val(),
+                    //по този начин датата се форматира yyyy-MM-ddThh:mm:ss - което позволява да се изпрати правилно дори и с Get метод - както се получава при експорт на данните в ексел
+                    // $('#searchModel_FromDate').parent().data("DateTimePicker").viewDate() връща датата в Moment, а format връща стринг в горния формат.
+                    fromDate: $('#searchModel_FromDate').parent().data("DateTimePicker").viewDate().format(),
+                    toDate: $('#searchModel_ToDate').parent().data("DateTimePicker").viewDate().format(),
+                    sessionId: $('#sessionId').val(),
+                    userName: $('#userName').val(),
+                    auditTypes: $('#auditType').val()
+                }
+            });
+        }
+
+        function serialize (obj) {
+            var str = [];
+            for (var p in obj)
+                if (obj.hasOwnProperty(p)) {
+                    if (obj[p].constructor === Array) {
+                        for (i = 0; i < obj[p].length; i++) {
+                            str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p][i]));
+                        }
+                    }
+                    else {
+                        str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+                    }
+                }
+            return str.join("&");
+        }
     </script>
 }

@@ -1,5 +1,13 @@
 ﻿<ul class="nav navbar-nav">
-    <li>@Html.ActionLink("Начало", "Index", "Home")</li>
-    <li>@Html.ActionLink("Услуги", "Index", "Call")</li>
-    <li>@Html.ActionLink("Админ", "Index", "Admin")</li>
+    @if (User.Identity.IsAuthenticated)
+    {
+        <li>@Html.ActionLink("Задачи", "Index", "Home")</li>
+        <li>@Html.ActionLink("Удостоверения", "Index", "Select")</li>
+        <li>@Html.ActionLink("Справки", "Index", "Report")</li>
+        <li>@Html.ActionLink("Админ", "Index", "Admin")</li>
+    }
+    @if (Kontrax.Regux.Service.ConfigService.DevModeEnabled)
+    {
+        <li>@Html.ActionLink("Тест", "Index", "Test")</li>
+    }
 </ul>

@@ -36,16 +36,29 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AccessLevel.cs">
+      <DependentUpon>Regux.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Activity.cs">
+      <DependentUpon>Regux.tt</DependentUpon>
+    </Compile>
     <Compile Include="Administration.cs">
+      <DependentUpon>Regux.tt</DependentUpon>
+    </Compile>
+    <Compile Include="AdministrationCertificate.cs">
+      <DependentUpon>Regux.tt</DependentUpon>
+    </Compile>
+    <Compile Include="AdministrationKind.cs">
       <DependentUpon>Regux.tt</DependentUpon>
     </Compile>
     <Compile Include="AspNetRole.cs">
@@ -54,19 +67,51 @@
     <Compile Include="AspNetUser.cs">
       <DependentUpon>Regux.tt</DependentUpon>
     </Compile>
+    <Compile Include="AuditConfig.cs">
+      <DependentUpon>Regux.tt</DependentUpon>
+    </Compile>
+    <Compile Include="AuditDetail.cs">
+      <DependentUpon>Regux.tt</DependentUpon>
+    </Compile>
+    <Compile Include="AuditType.cs">
+      <DependentUpon>Regux.tt</DependentUpon>
+    </Compile>
+    <Compile Include="AuditView.cs">
+      <DependentUpon>Regux.tt</DependentUpon>
+    </Compile>
+    <Compile Include="EAuth.cs">
+      <DependentUpon>Regux.tt</DependentUpon>
+    </Compile>
+    <Compile Include="RegiXReport.Extension.cs" />
     <Compile Include="Audit.cs">
+      <DependentUpon>Regux.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Batch.cs">
       <DependentUpon>Regux.tt</DependentUpon>
     </Compile>
     <Compile Include="Config.cs">
       <DependentUpon>Regux.tt</DependentUpon>
     </Compile>
+    <Compile Include="DbContextUtil.cs" />
+    <Compile Include="Dependency.cs">
+      <DependentUpon>Regux.tt</DependentUpon>
+    </Compile>
+    <Compile Include="KeyType.cs">
+      <DependentUpon>Regux.tt</DependentUpon>
+    </Compile>
     <Compile Include="LocalRole.cs">
       <DependentUpon>Regux.tt</DependentUpon>
     </Compile>
-    <Compile Include="PidType.cs">
+    <Compile Include="PrintTemplate.cs">
       <DependentUpon>Regux.tt</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RegiXReport.cs">
+      <DependentUpon>Regux.tt</DependentUpon>
+    </Compile>
+    <Compile Include="RegiXReportKey.cs">
+      <DependentUpon>Regux.tt</DependentUpon>
+    </Compile>
     <Compile Include="Regux.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -82,6 +127,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Regux.edmx</DependentUpon>
     </Compile>
+    <Compile Include="AspNetUser.Extension.cs" />
     <Compile Include="Request.cs">
       <DependentUpon>Regux.tt</DependentUpon>
     </Compile>
@@ -91,14 +137,13 @@
     <Compile Include="Service.cs">
       <DependentUpon>Regux.tt</DependentUpon>
     </Compile>
-    <Compile Include="ServiceStep.cs">
+    <Compile Include="ServiceSection.cs">
       <DependentUpon>Regux.tt</DependentUpon>
     </Compile>
     <Compile Include="Signal.cs">
       <DependentUpon>Regux.tt</DependentUpon>
     </Compile>
-    <Compile Include="AspNetUser.Extension.cs" />
-    <Compile Include="UserLocalRole.cs">
+    <Compile Include="Workplace.cs">
       <DependentUpon>Regux.tt</DependentUpon>
     </Compile>
   </ItemGroup>
@@ -109,7 +154,9 @@
     </EntityDeploy>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.Config" />
+    <None Include="App.Config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
     <None Include="Regux.edmx.diagram">
       <DependentUpon>Regux.edmx</DependentUpon>

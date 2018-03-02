@@ -1,12 +1,12 @@
 ﻿using System.Threading.Tasks;
 using System.Web.Mvc;
-using Kontrax.Regux.Model;
 using Kontrax.Regux.Model.Config;
+using Kontrax.Regux.Model.GlobalAdmin;
 using Kontrax.Regux.Service;
 
 namespace Kontrax.Regux.Portal.Controllers
 {
-    [Authorize(Roles = Role.GlobalAdmin)]
+    [GlobalAdmin]
     public class GlobalAdminController : BaseController
     {
         // Полето за подател трябва да допуска триъгълни скоби, но атрибутът AllowHtml не се вижда от Model проекта,
@@ -41,7 +41,7 @@ namespace Kontrax.Regux.Portal.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public Task<ActionResult> Smtp(SmtpEditModel model)
         {
-            return TryAsync(true,
+            return TryAsync(
                 async () =>
                 {
                     SmtpConfig smtpConfig = new SmtpConfig
@@ -55,7 +55,7 @@ namespace Kontrax.Regux.Portal.Controllers
                     };
                     using (ConfigService service = new ConfigService())
                     {
-                        await service.SetSmtpConfigAsync(smtpConfig);
+                        await service.SetSmtpConfigAsync(smtpConfig, GetAuditModel());
                     }
                 },
                 () => View(model),

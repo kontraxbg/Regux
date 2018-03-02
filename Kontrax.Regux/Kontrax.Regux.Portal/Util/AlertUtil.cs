@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Web.Mvc;
 
-namespace Kontrax.Regux.Portal.Controllers
+namespace Kontrax.Regux.Portal.Util
 {
     public static class AlertUtil
     {
@@ -70,7 +70,7 @@ namespace Kontrax.Regux.Portal.Controllers
         private static void AddAlert(TempDataDictionary tempData, string alertStyle, string message, bool isDismissable)
         {
             List<AlertModel> alerts = GetAlerts(tempData);
-            alerts.Add(new AlertModel(alertStyle, message.NewLineToBr(), true));
+            alerts.Add(new AlertModel(alertStyle, message?.Replace("<", "&lt;").Replace(">", "&gt;").NewLineToBr(), true));
             tempData[_tempDataKey] = alerts;
         }
 

@@ -14,19 +14,28 @@ namespace Kontrax.Regux.Data
     
     public partial class Request
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public Request()
+        {
+            this.Audits = new HashSet<Audit>();
+        }
+    
         public int Id { get; set; }
-        public string UserId { get; set; }
-        public int ServiceId { get; set; }
+        public int BatchId { get; set; }
+        public int RegiXReportId { get; set; }
         public string Argument { get; set; }
-        public string CallContext { get; set; }
-        public System.DateTime DraftDateTime { get; set; }
+        public string PersonOrCompanyId { get; set; }
+        public byte[] RequestTimeStamp { get; set; }
+        public byte[] ResponseTimeStamp { get; set; }
         public Nullable<System.DateTime> StartDateTime { get; set; }
         public Nullable<System.DateTime> EndDateTime { get; set; }
-        public Nullable<System.DateTime> DeleteDateTime { get; set; }
         public string Error { get; set; }
+        public bool IsCanceled { get; set; }
     
-        public virtual AspNetUser AspNetUser { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Audit> Audits { get; set; }
+        public virtual Batch Batch { get; set; }
+        public virtual RegiXReport RegiXReport { get; set; }
         public virtual Response Response { get; set; }
-        public virtual Service Service { get; set; }
     }
 }

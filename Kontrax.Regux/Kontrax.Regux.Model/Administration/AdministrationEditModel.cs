@@ -1,13 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Kontrax.Regux.Model.Administration
 {
-    public class AdministrationEditModel: AdministrationModel
+    public class AdministrationEditModel: AdministrationBaseModel
     {
-        public IEnumerable<IdNameModel> Administrations { get; set; }
+        #region View data
+
+        public CodeNameModel[] Kinds { get; set; }
+
+        [Display(Name = "Доставчик на обществени услуги")]
+        public bool IsPublicServiceProvider { get; set; }
+
+        #endregion
+
+        [Display(Name = "Вид")]
+        public string KindCode { get; set; }
+
+        [Display(Name = "ЕИК")]
+        public string Uic { get; set; }
+
+        [Display(Name = "OID")]
+        public string Oid { get; set; }
     }
 }

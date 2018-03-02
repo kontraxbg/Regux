@@ -24,11 +24,11 @@ namespace Kontrax.Regux.Portal.Util
         {
             if (string.IsNullOrEmpty(password) || password.Length < _minimumLength)
             {
-                return Task.FromResult(IdentityResult.Failed($"Паролата е необходимо да е поне {_minimumLength} символа"));
+                return Task.FromResult(IdentityResult.Failed($"Дължината на паролата трябва да бъде поне {_minimumLength} знака."));
             }
             if (Regex.Matches(password, _passwordGoodEntropyRegex).Count == 0)
             {
-                return Task.FromResult(IdentityResult.Failed($"Паролата не може да съдържа един и същ знак или цифра повече от 3 пъти последователно. Моля изберете друга парола."));
+                return Task.FromResult(IdentityResult.Failed($"Паролата не може да съдържа един и същ знак повече от 3 пъти последователно. Моля изберете друга парола."));
             }
             var dictionary = LoadDictionary();
             if (dictionary.Contains(password))

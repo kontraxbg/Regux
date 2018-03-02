@@ -13,6 +13,14 @@
     <div class="panel-body">
         @using (Html.BeginForm())
         {
+            // Chrome не уважава настройката autocomplete="off", нито на полетата, нито на формата.
+            // Тези полета отвличат вниманието на Chrome (autocomplete-ването) от истинските полета за име и парола по-долу.
+            // Конкретните имена на 4-те полета не оказват влияние. Това не работи ако dummy полетата са скрити, затова се крият заобиколно.
+            <div class="" style="width: 0; height: 0; overflow: hidden">
+                <input autocomplete="off" name="Dummy1" value="" style="" />
+                <input type="password" autocomplete="off" name="Dummy2" value="" style="" />
+            </div>
+
             @Html.AntiForgeryToken()
             <div class="form-horizontal">
                 <div class="form-group">
@@ -30,12 +38,12 @@
                 <div class="form-group">
                     @Html.LabelFor(model => model.UserName, new { @class = "control-label col-md-2" })
                     <div class="col-md-4">
-                        @Html.EditorFor(model => model.UserName, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.EditorFor(model => model.UserName, new { htmlAttributes = new { @class = "form-control", autocomplete = "off" } })
                         @Html.ValidationMessageFor(model => model.UserName)
                     </div>
                     @Html.LabelFor(model => model.Password, new { @class = "control-label col-md-2" })
                     <div class="col-md-4">
-                        @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control", autocomplete = "off" } })
                         @Html.ValidationMessageFor(model => model.Password)
                     </div>
                 </div>

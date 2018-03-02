@@ -96,20 +96,6 @@ namespace Kontrax.Regux.Service
         //    }
         //}
 
-        public X509Certificate2 LoadCertificate(string issuerFileName, string password)
-        {
-            // We need to pass 'Exportable', otherwise we can't get the private key.
-            var issuerCertificate = new X509Certificate2(issuerFileName, password, X509KeyStorageFlags.Exportable);
-            return issuerCertificate;
-        }
-
-        public X509Certificate2 LoadCertificate(byte[] issuerCertificateData, string password)
-        {
-            // We need to pass 'Exportable', otherwise we can't get the private key.
-            var issuerCertificate = new X509Certificate2(issuerCertificateData, password, X509KeyStorageFlags.Exportable);
-            return issuerCertificate;
-        }
-
         public X509Certificate2 IssueCertificate(string subjectName, X509Certificate2 issuerCertificate, string[] subjectAlternativeNames)
         {
              return IssueCertificate(subjectName, issuerCertificate, subjectAlternativeNames, new[] { KeyPurposeID.IdKPServerAuth });
@@ -208,7 +194,9 @@ namespace Kontrax.Regux.Service
             // Set the signature algorithm. This is used to generate the thumbprint which is then signed
             // with the issuer's private key. We'll use SHA-256, which is (currently) considered fairly strong.
             const string signatureAlgorithm = "SHA256WithRSA";
+#pragma warning disable CS0618 // 'X509V3CertificateGenerator.SetSignatureAlgorithm(string)' is obsolete: 'Not needed if Generate used with an ISignatureFactory'
             certificateGenerator.SetSignatureAlgorithm(signatureAlgorithm);
+#pragma warning restore CS0618 // 'X509V3CertificateGenerator.SetSignatureAlgorithm(string)' is obsolete: 'Not needed if Generate used with an ISignatureFactory'
 
             var issuerDN = new X509Name(issuerName);
             certificateGenerator.SetIssuerDN(issuerDN);
@@ -238,7 +226,9 @@ namespace Kontrax.Regux.Service
                 AddSubjectAlternativeNames(certificateGenerator, subjectAlternativeNames);
 
             // The certificate is signed with the issuer's private key.
+#pragma warning disable CS0618 // 'X509V3CertificateGenerator.Generate(AsymmetricKeyParameter, SecureRandom)' is obsolete: 'Use Generate with an ISignatureFactory'
             var certificate = certificateGenerator.Generate(issuerKeyPair.Private, random);
+#pragma warning restore CS0618 // 'X509V3CertificateGenerator.Generate(AsymmetricKeyParameter, SecureRandom)' is obsolete: 'Use Generate with an ISignatureFactory'
             return certificate;
         }
 
@@ -409,6 +399,22 @@ namespace Kontrax.Regux.Service
         {
             var bytes = certificate.Export(X509ContentType.Pfx, password);
             return bytes;
+        }
+
+        public IEnumerable<X509Certificate2> GetAllRootCertificates()
+        {
+            var store = new System.Security.Cryptography.X509Certificates.X509Store(System.Security.Cryptography.X509Certificates.StoreName.Root, System.Security.Cryptography.X509Certificates.StoreLocation.LocalMachine); 
+            
+            store.Open(System.Security.Cryptography.X509Certificates.OpenFlags.ReadOnly);
+            var certificates = store.Certificates;
+
+            List<X509Certificate2> X509v2certificates = new List<X509Certificate2>();
+            foreach (var certificate in certificates)
+            {
+                X509v2certificates.Add(certificate);
+            }
+
+            return X509v2certificates;
         }
 
     }

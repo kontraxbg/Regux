@@ -1,56 +1,296 @@
-﻿@model Kontrax.Regux.Model.Administration.AdministrationViewModel
+﻿@using Kontrax.Regux.Model.Administration
+@using Kontrax.Regux.Model.Certificate
+
+@model AdministrationDetailsModel
 
 @{
-    ViewBag.Title = "Детайли";
+    ViewBag.Title = Model.Name;
+    bool canManageActivities = Model.CurrentUser.CanManageActivities(Model.Id);
+    bool canManageCertificates = Model.CurrentUser.CanManageCertificates(Model.Id);
 }
 
 @section Subtitle {
-    @Html.ActionLink("Назад към списъка с администрации", "Index")
+    @Html.ActionLink(Model.IsPublicServiceProvider ? "Назад към доставчиците на обществени услуги" : "Назад към списъка с администрации", "Index", new { psp = Model.IsPublicServiceProvider })
 }
 
-<div class="panel panel-info">
-    <div class="panel-heading"></div>
+@helper RenderActivity(ActivityDetailsModel activity, bool canManageActivities)
+{
+    <li>
+        @if (canManageActivities)
+        {
+            @Html.ActionLink(activity.Title, "Edit", "Activity", new { id = activity.Id }, null)
+        }
+        else
+        {
+            @Html.DisplayFor(_ => activity.Title)
+        }
+        @if (activity.Dependencies.Count() > 0)
+        {
+            @(" / ")
+            @Html.ActionLink("Печатни шаблони", "PrintTemplates", "Activity", new { activityId = activity.Id }, null)
+        }
+        @Html.DisplayFor(_ => activity)
+    </li>
+}
+
+@helper CertificateUploadForm(CertTypeCode typeCode)
+{
+    using (Html.BeginForm("UploadCertificate", null, new { id = Model.Id, typeCode = typeCode }, FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken()
+        <div class="form-group">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <input type="text" placeholder="Изберете файл..." disabled class="form-control filePlaceholder" />
+                    <div class="input-group-btn">
+                        <div class="fileUpload btn btn-primary btn-small">
+                            <span class="glyphicon glyphicon-folder-open"></span>
+                            <input type="file" class="upload" name="fileContent" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <label class="col-md-2 control-label" for="Password">Парола за файла</label>
+            <div class="col-md-4">
+                <div class="input-group">
+                    <input type="password" class="form-control" name="Password" id="Password" />
+                    <div class="input-group-btn">
+                        <button type="submit" class="col-md-12 btn btn-primary"><span class="glyphicon glyphicon-upload"></span> Качване</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+<div class="panel @(Model.IsClosed ? "panel-danger" : "panel-info")">
+    <div class="panel-heading">
+        @(Model.IsClosed ? (Model.IsPublicServiceProvider ? "Доставчикът на обществени услуги е закрит" : "Администрацията е закрита") : "Основни данни")
+        @if (Model.CurrentUser.IsGlobalAdmin)
+        {
+            <a href="@Url.Action("Edit", new { id = Model.Id })"><span class="glyphicon glyphicon-edit pull-right" data-toggle="tooltip" title="редактиране"></span></a>
+        }
+    </div>
     <div class="panel-body">
         <div class="row">
-            @Html.LabelFor(model => model.Code, new { @class = "control-label col-md-2 text-right" })
-            @Html.DisplayFor(model => model.Code, new { @class = "col-md-10" })
-        </div>
-        <div class="form-group row">
-            @Html.LabelFor(model => model.ParentName, new { @class = "control-label col-md-2 text-right" })
-            @Html.DisplayFor(model => model.ParentName, new { @class = "col-md-10" })
+            @Html.LabelFor(model => model.IisdaNumber, new { @class = "col-md-2 text-right" })
+            @Html.DisplayFor(model => model.IisdaNumber)
+            @if (Model.BatchId.HasValue && Model.BatchId != Model.IisdaNumber)
+            {
+                <span>(Batch @Html.DisplayFor(model => model.BatchId))</span>
+            }
         </div>
         <div class="row">
-            @Html.LabelFor(model => model.Name, new { @class = "control-label col-md-2 text-right" })
-            @Html.DisplayFor(model => model.Name, new { @class = "col-md-10" })
+            @Html.LabelFor(model => model.Kind, new { @class = "col-md-2 text-right" })
+            @if (!string.IsNullOrEmpty(Model.Kind))
+            {
+                @Html.DisplayFor(model => model.Kind)
+            }
+            else if (Model.IsPublicServiceProvider)
+            {
+                @Html.DisplayNameFor(model => model.IsPublicServiceProvider)
+            }
+        </div>
+        <div class="row">
+            @Html.LabelFor(model => model.Uic, new { @class = "col-md-2 text-right" })
+            @Html.DisplayFor(model => model.Uic)
+        </div>
+        <div class="row">
+            @Html.LabelFor(model => model.Oid, new { @class = "col-md-2 text-right" })
+            @Html.DisplayFor(model => model.Oid)
         </div>
     </div>
+    <div class="panel-heading">
+        @Html.DisplayNameFor(model => model.SpecificServices)
+        @if (Model.CurrentUser.IsGlobalAdmin)
+        {
+            <a href="@Url.Action("CreateServiceActivity", "Activity", new { administrationId = Model.Id })"><span class="glyphicon glyphicon-plus pull-right" data-toggle="tooltip" title="добавяне"></span></a>
+        }
+    </div>
+    <div class="panel-body">
+        @if (Model.SpecificServices != null && Model.SpecificServices.Length > 0)
+        {
+            <ul class="col-md-10">
+                @foreach (var activity in Model.SpecificServices)
+                {
+                    @RenderActivity(activity, canManageActivities)
+                }
+            </ul>
+        }
+        else
+        {
+            <span>Няма</span>
+        }
+    </div>
+    <div class="panel-heading">
+        @Html.DisplayNameFor(model => model.OtherActivities)
+        @if (Model.CurrentUser.IsGlobalAdmin)
+        {
+            <a href="@Url.Action("CreateOtherActivity", "Activity", new { administrationId = Model.Id })"><span class="glyphicon glyphicon-plus pull-right" data-toggle="tooltip" title="добавяне"></span></a>
+        }
+    </div>
+    <div class="panel-body">
+        @if (Model.OtherActivities != null && Model.OtherActivities.Length > 0)
+        {
+            <ul class="col-md-10">
+                @foreach (var activity in Model.OtherActivities)
+                {
+                    @RenderActivity(activity, canManageActivities)
+                }
+            </ul>
+        }
+        else
+        {
+            <span>Няма</span>
+        }
+    </div>
+    @* Ако няма общи услуги, цялата секция се скрива.
+        Всички администрации имат общи услуги. Доставчиците на обществени услуги нямат общи услуги. *@
+    @if (Model.CommonServices != null && Model.CommonServices.Length > 0)
+    {
+        <div class="panel-heading">
+            @Html.DisplayFor(model => model.CommonServicesTitle)
+        </div>
+        <div class="panel-body">
+            <ul class="col-md-10">
+                @foreach (var activity in Model.CommonServices)
+                {
+                    @RenderActivity(activity, canManageActivities)
+                }
+            </ul>
+        </div>
+    }
+    <div class="panel-heading">
+        @Html.DisplayFor(model => model.LocalRolesTitle)
+        @if (Model.CurrentUser.CanManageLocalRoles(Model.Id))
+        {
+            <a href="@Url.Action("Edit", "LocalRole", new { id = Model.Id })"><span class="glyphicon glyphicon-edit pull-right" data-toggle="tooltip" title="редактиране"></span></a>
+        }
+    </div>
+    <div class="panel-body">
+        @if (Model.LocalRoles.Length > 0)
+        {
+            <table class="table table-striped">
+                <tr>
+                    <th>@Html.DisplayNameFor(model => model.LocalRoles[0].Name)</th>
+                    <th>@Html.DisplayNameFor(model => model.LocalRoles[0].AllowedRegiXReports)</th>
+                </tr>
+                @foreach (var localRole in Model.LocalRoles)
+                {
+                    <tr>
+                        <td>@Html.DisplayFor(_ => localRole.Name)</td>
+                        <td>
+                            @if (localRole.AllowedRegiXReports.Any())
+                            {
+                                foreach (var regiXReport in localRole.AllowedRegiXReports)
+                                {
+                                    @Html.DisplayFor(_ => regiXReport)<br />
+                                }
+                            }
+                            else
+                            {
+                                @("(няма достъп)")
+                            }
+                        </td>
+                    </tr>
+                }
+            </table>
+        }
+        else
+        {
+            <span>Няма</span>
+        }
+    </div>
 </div>
 
+<div class="panel panel-default">
+    @if (!Model.RegiXCertificate.IsEmpty)
+    {
+        <div class="panel-heading clearfix">
+            @Html.DisplayNameFor(model => model.RegiXCertificate)
+            @if (canManageCertificates)
+            {
+                <div class="btn-group pull-right">
+                    <a href="@Url.Action("DownloadCertificate", new { id = Model.Id, typeCode = CertTypeCode.RegiX })" class="btn btn-default"><span class="glyphicon glyphicon-download"></span> Изтегляне</a>
+                    <a href="#" class="btn btn-danger" data-bind="click: deleteRegiXCertificate" title="Изтриване"><span class="glyphicon glyphicon-trash"></span></a>
+                </div>
+            }
+        </div>
+        <div class="panel-body">
+            @Html.DisplayFor(model => model.RegiXCertificate)
+        </div>
+    }
+    else
+    {
+        <div class="panel-heading">
+            @Html.DisplayNameFor(model => model.RegiXCertificate)
+        </div>
+        <div class="panel-body form-horizontal">
+            @if (canManageCertificates)
+            {
+                @CertificateUploadForm(CertTypeCode.RegiX)
+            }
+            else
+            {
+                @Html.DisplayFor(model => model.RegiXCertificate)
+            }
+        </div>
+    }
+</div>
 
 <div class="panel panel-default">
     <div class="panel-heading clearfix">
-        @Html.DisplayNameFor(model => model.Certificate)
-    <div class="btn-group pull-right" role="group" aria-label="...">
-        <a href="#" class="btn btn-default" data-bind="click: removeCertificate"><span class="glyphicon glyphicon-trash"></span> Премахни</a>
+        @Html.DisplayNameFor(model => model.RootCertificate)
+        @if (!Model.RootCertificate.IsEmpty)
+        {
+            <div class="btn-group pull-right" role="group" aria-label="...">
+                @if (canManageCertificates)
+                {
+                    <a href="@Url.Action("DownloadCertificate", new { id = Model.Id, typeCode = CertTypeCode.Root })" class="btn btn-default"><span class="glyphicon glyphicon-download"></span> Изтегляне</a>
+                }
+                @if (Model.CurrentUser.IsGlobalAdmin)
+                {
+                    <a href="#" class="btn btn-danger" data-bind="click: deleteRootCertificate" title="Изтриване"><span class="glyphicon glyphicon-trash"></span></a>
+                }
+            </div>
+        }
     </div>
-</div>
-<div class="panel-body">
-    @Html.DisplayFor(model => model.CertificateView)
-</div>
-</div>
+    <div class="panel-body">
+        @Html.DisplayFor(model => model.RootCertificate)
+    </div>
 
-<div class="panel panel-default">
-    <div class="panel-heading clearfix">
-        @Html.DisplayNameFor(model => model.ProposedCertificate)
-    <div class="btn-group pull-right" role="group" aria-label="...">
-        <a href="#" class="btn btn-default" data-bind="click: generateProposedCertificate"><span class="glyphicon glyphicon-ok"></span> Издай CA</a>
-        <a href="#" class="btn btn-default" data-bind="click: approveProposedCertificate"><span class="glyphicon glyphicon-ok"></span> Одобри</a>
-        <a href="#" class="btn btn-default" data-bind="click: removeProposedCertificate"><span class="glyphicon glyphicon-trash"></span> Премахни</a>
-    </div>
-</div>
-<div class="panel-body">
-    @Html.DisplayFor(model => model.ProposedCertificateView)
-</div>
+    @if (!Model.ProposedRootCertificate.IsEmpty)
+    {
+        <div class="panel-heading clearfix">
+            @Html.DisplayNameFor(model => model.ProposedRootCertificate)
+            <div class="btn-group pull-right">
+                @if (Model.CurrentUser.IsGlobalAdmin)
+                {
+                    <a href="#" class="btn btn-success" data-bind="click: approveProposedRootCertificate"><span class="glyphicon glyphicon-ok"></span> Одобряване</a>
+                }
+                @if (canManageCertificates)
+                {
+                    <a href="@Url.Action("DownloadCertificate", new { id = Model.Id, typeCode = CertTypeCode.ProposedRoot })" class="btn btn-default"><span class="glyphicon glyphicon-download"></span> Изтегляне</a>
+                    <a href="#" class="btn btn-danger" data-bind="click: deleteProposedRootCertificate" title="Изтриване"><span class="glyphicon glyphicon-trash"></span></a>
+                }
+            </div>
+        </div>
+        <div class="panel-body">
+            @Html.DisplayFor(model => model.ProposedRootCertificate)
+        </div>
+    }
+    else if (canManageCertificates)
+    {
+        <div class="panel-heading clearfix">
+            @Html.DisplayNameFor(model => model.ProposedRootCertificate)
+            <div class="btn-group pull-right">
+                <a href="#" class="btn btn-default" data-bind="click: generateProposedRootCertificate"><span class="glyphicon glyphicon-certificate"></span> Генериране</a>
+            </div>
+        </div>
+        <div class="panel-body form-horizontal">
+            @CertificateUploadForm(CertTypeCode.ProposedRoot)
+        </div>
+    }
 </div>
 
 @section Scripts{
@@ -59,52 +299,35 @@
         function AdministrationDetailsViewModel() {
             var self = this;
 
-            self.generateProposedCertificate = function () {
-                $.get(app.baseUrl + 'api/Administration/GenerateProposedCertificate/' + @Model.Id)
-                    .success(function (data) {
-                        if (data) {
-                            location.reload();
-                        }
-                        else {
-                            app.showSimpleModal("Сертификат", "Грешка при генериране на сертификат");
-                        }
-                });
+            self.generateProposedRootCertificate = function () {
+                $.post('@Url.Action("GenerateProposedRootCertificate", new { id = Model.Id })')
+                    .done(function (data) { location.reload(); })
+                    .fail(function (jqxhr, status, error) { app.showSimpleModal("Сертификат", "Грешка при генериране на root сертификат"); });
             }
 
-            self.approveProposedCertificate = function () {
-                $.get(app.baseUrl + 'api/Administration/ApproveProposedCertificate/' + @Model.Id)
-                    .success(function (data) {
-                        if (data) {
-                            location.reload();
-                        }
-                        else {
-                            app.showSimpleModal("Сертификат", "Грешка при одобрение на сертификат");
-                        }
-                });
+            self.approveProposedRootCertificate = function () {
+                $.post('@Url.Action("ApproveProposedRootCertificate", new { id = Model.Id })')
+                    .done(function (data) { location.reload(); })
+                    .fail(function (jqxhr, status, error) { app.showSimpleModal("Сертификат", "Грешка при одобрение на root сертификата"); });
             }
 
-            self.removeProposedCertificate = function () {
-                $.get(app.baseUrl + 'api/Administration/RemoveProposedCertificate/' + @Model.Id)
-                    .success(function (data) {
-                        if (data) {
-                            location.reload();
-                        }
-                        else {
-                            app.showSimpleModal("Сертификат", "Грешка при премахване на сертификат");
-                        }
-                });
+            self.deleteRegiXCertificate = function () {
+                self.deleteCertificate('@CertTypeCode.RegiX', 'сертификата за достъп до RegiX');
             }
-
-            self.removeCertificate = function () {
-                $.get(app.baseUrl + 'api/Administration/RemoveCertificate/' + @Model.Id)
-                    .success(function (data) {
-                        if (data) {
-                            location.reload();
-                        }
-                        else {
-                            app.showSimpleModal("Сертификат", "Грешка при премахване на сертификат");
-                        }
-                });
+            self.deleteRootCertificate = function () {
+                self.deleteCertificate('@CertTypeCode.Root', 'root сертификата');
+            }
+            self.deleteProposedRootCertificate = function () {
+                self.deleteCertificate('@CertTypeCode.ProposedRoot', 'root сертификата, подлежащ на одобрение');
+            }
+            self.deleteCertificate = function (typeCode, theTypeName) {
+                var url = '@Url.Action("DeleteCertificate", new { id = Model.Id, typeCode = "_typeCode_" })';
+                url = url.replace('_typeCode_', typeCode);
+                if (confirm('Потвърдете изтриването на ' + theTypeName + '...')) {
+                    $.post(url)
+                        .done(function (data) { location.reload(); })
+                        .fail(function (jqxhr, status, error) { app.showSimpleModal('Сертификат', 'Грешка при изтриване на ' + theTypeName); });
+                }
             }
         }
 

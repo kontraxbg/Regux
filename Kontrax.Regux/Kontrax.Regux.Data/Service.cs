@@ -17,31 +17,30 @@ namespace Kontrax.Regux.Data
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public Service()
         {
-            this.Requests = new HashSet<Request>();
-            this.ChildInServiceSteps = new HashSet<ServiceStep>();
-            this.ParentInServiceSteps = new HashSet<ServiceStep>();
             this.Signals = new HashSet<Signal>();
+            this.Activities = new HashSet<Activity>();
         }
     
         public int Id { get; set; }
-        public string RegiXOperation { get; set; }
-        public int AdministrationId { get; set; }
         public string Name { get; set; }
         public string LegalBasis { get; set; }
-        public string Category { get; set; }
-        public string RegimeType { get; set; }
         public bool IsEu { get; set; }
         public bool IsInternal { get; set; }
         public bool IsRegime { get; set; }
+        public Nullable<long> Number { get; set; }
+        public string SectionCode { get; set; }
+        public string Subsection { get; set; }
+        public string RegimeName { get; set; }
+        public bool IsDeleted { get; set; }
+        public Nullable<System.DateTime> IisdaUpdateDateTime { get; set; }
+        public string IisdaUpdateResult { get; set; }
+        public Nullable<int> RegiXReportId { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Request> Requests { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<ServiceStep> ChildInServiceSteps { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<ServiceStep> ParentInServiceSteps { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Signal> Signals { get; set; }
-        public virtual Administration Administration { get; set; }
+        public virtual ServiceSection ServiceSection { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Activity> Activities { get; set; }
+        public virtual RegiXReport RegiXReport { get; set; }
     }
 }

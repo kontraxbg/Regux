@@ -20,15 +20,17 @@ namespace Kontrax.Regux.Data
         public int ServiceId { get; set; }
         public string EmployeeId { get; set; }
         public string EmployeeName { get; set; }
-        public string SenderPidTypeCode { get; set; }
-        public string SenderIdentifier { get; set; }
         public string SenderContact { get; set; }
         public string SenderNote { get; set; }
         public int AdministrationId { get; set; }
+        public string SenderId { get; set; }
+        public bool IsProposal { get; set; }
+        public Nullable<System.DateTime> ResolveDateTime { get; set; }
+        public string ResolverNote { get; set; }
     
-        public virtual AspNetUser AspNetUser { get; set; }
-        public virtual PidType PidType { get; set; }
+        public virtual AspNetUser Employee { get; set; }
         public virtual Service Service { get; set; }
         public virtual Administration Administration { get; set; }
+        public virtual AspNetUser Sender { get; set; }
     }
 }

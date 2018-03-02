@@ -14,20 +14,35 @@ namespace Kontrax.Regux.Data
     
     public partial class Audit
     {
-        public int ID { get; set; }
-        public string UserID { get; set; }
-        public System.DateTime TimeAccessed { get; set; }
-        public string IPAddress { get; set; }
-        public string URL { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public Audit()
+        {
+            this.AuditDetails = new HashSet<AuditDetail>();
+        }
+    
+        public int Id { get; set; }
+        public string UserId { get; set; }
+        public System.DateTime DateTime { get; set; }
+        public string IpAddress { get; set; }
+        public string Url { get; set; }
         public string Data { get; set; }
-        public string Activity { get; set; }
         public Nullable<long> Duration { get; set; }
         public string UserName { get; set; }
         public string Controller { get; set; }
         public string Action { get; set; }
-        public string SessionID { get; set; }
+        public string SessionId { get; set; }
         public string RequestMethod { get; set; }
+        public byte[] Hash { get; set; }
+        public Nullable<int> RequestId { get; set; }
+        public string Notes { get; set; }
+        public string AuditTypeCode { get; set; }
+        public string EntityName { get; set; }
+        public string EntityRecordId { get; set; }
     
         public virtual AspNetUser AspNetUser { get; set; }
+        public virtual Request Request { get; set; }
+        public virtual AuditType AuditType { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<AuditDetail> AuditDetails { get; set; }
     }
 }

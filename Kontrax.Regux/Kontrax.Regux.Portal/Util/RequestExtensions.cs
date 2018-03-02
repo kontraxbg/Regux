@@ -1,12 +1,11 @@
-﻿using Microsoft.Owin;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web;
+using Microsoft.Owin;
 
-namespace Kontrax.Regux.Portal.Util
+namespace Kontrax.Regux.Portal
 {
     public static class RequestExtension
     {

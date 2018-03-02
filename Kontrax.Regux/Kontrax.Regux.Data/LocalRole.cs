@@ -17,13 +17,18 @@ namespace Kontrax.Regux.Data
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public LocalRole()
         {
-            this.UserLocalRoles = new HashSet<UserLocalRole>();
+            this.Workplaces = new HashSet<Workplace>();
+            this.RegiXReports = new HashSet<RegiXReport>();
         }
     
-        public string Code { get; set; }
+        public int AdministrationId { get; set; }
+        public int Id { get; set; }
         public string Name { get; set; }
     
+        public virtual Administration Administration { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<UserLocalRole> UserLocalRoles { get; set; }
+        public virtual ICollection<Workplace> Workplaces { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<RegiXReport> RegiXReports { get; set; }
     }
 }

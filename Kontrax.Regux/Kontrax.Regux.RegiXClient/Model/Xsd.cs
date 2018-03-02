@@ -8,26 +8,26 @@ namespace Kontrax.Regux.RegiXClient.Model
     {
         private readonly Dictionary<string, XsdType> _types = new Dictionary<string, XsdType>();
         private readonly List<XsdElement> _roots = new List<XsdElement>();
-        private int _nextChoiceId = 1;
 
         public IReadOnlyDictionary<string, XsdType> Types { get { return _types; } }
 
         public IReadOnlyList<XsdElement> Roots { get { return _roots; } }
 
-        public void AddType(XsdType type)
+        internal void AddType(XsdType type)
         {
             _types.Add(type.QName, type);
         }
 
-        public void AddRoot(XsdElement element)
+        internal void AddRoot(XsdElement element)
         {
             _roots.Add(element);
         }
 
-        public int GenerateChoiceId()
-        {
-            return _nextChoiceId++;
-        }
+        //private int _nextChoiceId = 1;
+        //public int GenerateChoiceId()
+        //{
+        //    return _nextChoiceId++;
+        //}
 
         public override string ToString()
         {

@@ -1,30 +1,57 @@
 ﻿@using Microsoft.AspNet.Identity
+
 @if (Request.IsAuthenticated)
 {
-    using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
-    {
-    @Html.AntiForgeryToken()
+    string relativeUrl = Request.Url.GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped);
 
-    <form asp-area="" asp-controller="Account" asp-action="LogOff" method="post" id="logoutForm" class="navbar-right">
-        <ul class="nav navbar-nav navbar-right">
-            <li>
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown" rolw="button" aria-haspopup="true" aria-expanded="false">
-                    <span class="glyphicon glyphicon-user"></span> @User.Identity.GetUserName() <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu">
-                    <li><a href="@Url.Action("Index", "Manage")" title="Manage"> Управление</a></li>
-                    <li class="divider" role="separator" />
-                    <li><a href="#" onclick="$('#logoutForm').submit();"><span class="glyphicon glyphicon-log-out"></span> Изход</a></li>
-                </ul>
-            </li>
-        </ul>
-    </form>
+    using (Html.BeginForm("LogOff", "Account", new { returnUrl = relativeUrl, twoFactor = true, twoFactorRemember = false }, FormMethod.Post, new { id = "logoutForm1" }))
+    {
+        @Html.AntiForgeryToken()
     }
+    using (Html.BeginForm("LogOff", "Account", new { returnUrl = relativeUrl, twoFactor = true, twoFactorRemember = true }, FormMethod.Post, new { id = "logoutForm2" }))
+    {
+        @Html.AntiForgeryToken()
+    }
+
+    <ul class="nav navbar-nav navbar-right">
+        <li>
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" rolw="button" aria-haspopup="true" aria-expanded="false">
+                <span class="glyphicon glyphicon-user"></span> @User.Identity.GetUserName() <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+                <li><a href="@Url.Action("Index", "Manage")" title="Manage"> Лични настройки</a></li>
+                <li class="divider" role="separator"></li>
+                @if (Kontrax.Regux.Service.ConfigService.DevModeEnabled)
+                {
+                    <li><a href="#" onclick="$('#logoutForm1').submit();"><span class="glyphicon glyphicon-log-out text-danger"></span> Изход <small>(запомня еАвт)</small></a></li>
+                    <li><a href="#" onclick="$('#logoutForm2').submit();"><span class="glyphicon glyphicon-log-out text-danger"></span> Изход <small>(забравя еАвт)</small></a></li>
+                }
+                else
+                {
+                    <li><a href="#" onclick="$('#logoutForm2').submit();"><span class="glyphicon glyphicon-log-out"></span> Изход</a></li>
+                }
+            </ul>
+        </li>
+    </ul>
 }
 else
 {
+    string returnUrl = Request.QueryString["returnUrl"];
     <ul class="nav navbar-nav navbar-right">
-        <li>@Html.ActionLink("Register", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink" })</li>
-        <li>@Html.ActionLink("Log in", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })</li>
+        <li>@Html.ActionLink("Вход", "Login", "Account", new { returnUrl = returnUrl }, new { id = "loginLink" })</li>
+    </ul>
+}
+
+@{
+    Kontrax.Regux.Model.EAuth.EAuthResponseViewModel eAuthResponse =
+        Kontrax.Regux.Portal.Controllers.EAuthController.GetCachedEAuthResponse(Request);
+}
+@if (eAuthResponse != null && eAuthResponse.Email != null)
+{
+    <ul class="nav navbar-nav navbar-right">
+        <li>
+            @eAuthResponse.PidTypeCode @eAuthResponse.PersonIdentifier @eAuthResponse.PersonNamesLatin<br />
+            @eAuthResponse.Email @eAuthResponse.Phone
+        </li>
     </ul>
 }

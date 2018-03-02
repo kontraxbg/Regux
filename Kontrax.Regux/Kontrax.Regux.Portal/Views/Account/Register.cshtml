@@ -1,39 +1,140 @@
-﻿@model Kontrax.Regux.Portal.Models.RegisterViewModel
+﻿@using Kontrax.Regux.Model.Account
+@model RegisterModel
+
 @{
-    ViewBag.Title = "Register";
+    ViewBag.Title = string.Empty;
 }
 
-@using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form", autocomplete = "off" }))
+@section Subtitle {
+    @Html.Partial("_MinistryCouncilHeaderPartial")
+}
+
+<div class="h2 row">
+    <div class="col-md-offset-2 col-md-10">Заявление за регистриране на потребител</div>
+</div>
+@using (Html.BeginForm("Register", null, null, FormMethod.Post, new { @class = "form-horizontal", role = "form", autocomplete = "off" }))
 {
     @Html.AntiForgeryToken()
-    <h4>Create a new account.</h4>
-    <hr />
-    @Html.ValidationSummary("", new { @class = "text-danger" })
+    @Html.ValidationSummary(true, null, new { @class = "text-danger" })
     <div class="form-group">
-        @Html.LabelFor(m => m.Email, new { @class = "col-md-2 control-label" })
-        <div class="col-md-10">
-            @Html.TextBoxFor(m => m.Email, new { @class = "form-control", autocomplete="off" })
+        <div class="col-md-offset-2 col-md-9">
+            <label>
+                @Html.RadioButtonFor(m => m.IsPublicServiceProvider, false, new { onclick = "app.showAdministrations();" })
+                @Html.DisplayNameFor(m => m.AdministrationId)
+            </label>
+            &nbsp;
+            <label>
+                @Html.RadioButtonFor(m => m.IsPublicServiceProvider, true, new { onclick = "app.showPublicServiceProviders();" })
+                @Html.DisplayNameFor(m => m.PublicServiceProviderId)
+            </label>
         </div>
     </div>
-    <div class="form-group">
-        @Html.LabelFor(m => m.Password, new { @class = "col-md-2 control-label" })
-        <div class="col-md-10">
-            @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+    <div id="administrations-panel" class="@(Model.IsPublicServiceProvider ? "collapse" : null)">
+        <div class="form-group">
+            <label class="col-md-2 control-label">Работя в</label>
+            <div class="col-md-9">
+                @Html.DropDownListFor(m => m.AdministrationId, new SelectList(Model.Administrations, "Id", "Name"), "(изберете)", new { @class = "form-control select2-search-select" })
+                @Html.ValidationMessageFor(m => m.AdministrationId, null, new { @class = "text-danger" })
+            </div>
         </div>
     </div>
-    <div class="form-group">
-        @Html.LabelFor(m => m.ConfirmPassword, new { @class = "col-md-2 control-label" })
-        <div class="col-md-10">
-            @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
+    @* Select2 има бъг. Ако се създаде в скрит родител, после ширината не е правилна: https://github.com/select2/select2/issues/3817 *@
+    <div id="public-service-providers-panel" class="@(!Model.IsPublicServiceProvider ? "collapse" : null)">
+        <div class="form-group">
+            <label class="col-md-2 control-label">Работя в</label>
+            <div class="col-md-9">
+                @Html.DropDownListFor(m => m.PublicServiceProviderId, new SelectList(Model.PublicServiceProviders, "Id", "Name"), "(изберете)", new { @class = "form-control select2-search-select" })
+                @Html.ValidationMessageFor(m => m.PublicServiceProviderId, null, new { @class = "text-danger" })
+            </div>
+        </div>
+        <div id="new-psp-panel" class="@(Model.PublicServiceProviderId != RegisterModel.NewPspId ? "collapse" : null)">
+            <div class="form-group">
+                @Html.LabelFor(m => m.NewPspName, new { @class = "col-md-2 control-label" })
+                <div class="col-md-9">
+                    @Html.EditorFor(m => m.NewPspName, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(m => m.NewPspName, null, new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.NewPspUic, new { @class = "col-md-2 control-label" })
+                <div class="col-md-4">
+                    @Html.EditorFor(m => m.NewPspUic, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(m => m.NewPspUic, null, new { @class = "text-danger" })
+                </div>
+            </div>
         </div>
     </div>
-    <div class="form-group">
-        <div class="col-md-offset-2 col-md-10">
-            <input type="submit" class="btn btn-default" value="Register" />
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                @Html.LabelFor(m => m.AccessLevelCode, new { @class = "col-md-4 control-label" })
+                <div class="col-md-8">
+                    @Html.DropDownListFor(m => m.AccessLevelCode, new SelectList(Model.AccessLevels, "Code", "Name"), new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.AccessLevelCode, null, new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.UserName, new { @class = "col-md-4 control-label" })
+                <div class="col-md-8">
+                    @Html.TextBoxFor(m => m.UserName, new { @class = "form-control", autocomplete = "off" })
+                    @Html.ValidationMessageFor(m => m.UserName, null, new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <div class="col-md-offset-4 col-md-8">
+                    <input type="submit" value="Изпращане" class="btn btn-primary col-md-12" />
+                </div>
+            </div>
         </div>
     </div>
 }
+<div class="row">
+    <div class="col-md-offset-2 col-md-10 help-block">
+        Заявлението ще бъде разгледано от @Kontrax.Regux.Model.Role.GlobalAdminName и ще получите отговор на посочената електронна поща.
+    </div>
+</div>
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        // Полетата за въвеждане на име и ЕИК на доставчик на обществени услуги се показват само ако от списъка се изнере "ДРУГ".
+        $('#PublicServiceProviderId').change(function (e) {
+            var selectedId = $(e.target).val();
+            var $panel = $('#new-psp-panel');
+            if (selectedId === '@RegisterModel.NewPspId') {
+                $panel.show();
+            }
+            else {
+                $panel.hide();
+            }
+        });
+
+        app.showAdministrations = function () {
+            app.switchPanels('public-service-providers-panel', 'administrations-panel');
+        };
+
+        app.showPublicServiceProviders = function () {
+            app.switchPanels('administrations-panel', 'public-service-providers-panel');
+        };
+
+        app.switchPanels = function (oldPanelId, newPanelId) {
+            var $oldSelect = $('#' + oldPanelId + ' select');
+            var $newSelect = $('#' + newPanelId + ' select');
+            @*
+                Select2 има бъг.Ако се създаде в скрит родител, после ширината не е правилна: https://github.com/select2/select2/issues/3817
+                Workaround: При показване на скрития списък, ширината му се копира от видимия списък, защото тя се очаква да е правилна.
+                Не е важна ширината на select елемента, а на span-а след него.
+            *@
+            var correctWidth = $oldSelect.next('.select2-container').width();
+            $newSelect.next('.select2-container').width(correctWidth);
+
+            $('#' + newPanelId).show();
+            $('#' + oldPanelId).hide();
+            $oldSelect.val('').trigger('change');
+        }
+    </script>
 }

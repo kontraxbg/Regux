@@ -1,42 +1,65 @@
-﻿@model IEnumerable<Kontrax.Regux.Model.Audit.AuditViewModel>
+﻿@*@model IEnumerable<Kontrax.Regux.Model.Audit.AuditViewModel>*@
+@model IEnumerable<Kontrax.Regux.Model.Audit.AuditViewModel>
+@using Kontrax.Regux.Service
+    
 
 @(Html
     .Grid(Model)
+    .RowCss(m => m.HashIsValid() ? "" : "danger")
     .Build(columns =>
     {
-        columns.Add(m => m.TimeAccessed).Titled(Html.DisplayNameFor(model => model.First().TimeAccessed));
-        columns.Add(m => m.Duration).Titled(Html.DisplayNameFor(model => model.First().Duration));
-        columns.Add(m => m.IPAddress).Titled(Html.DisplayNameFor(model => model.First().IPAddress));
-        columns.Add(m => m.SessionID).Titled(Html.DisplayNameFor(model => model.First().SessionID))
+        columns.Add(m => m.Id).Titled("").Encoded(false).RenderedAs(model => Html.Raw(
+                !model.HashIsValid() ?
+                "<span class=\"glyphicon glyphicon-remove text-danger\" data-toggle=\"tooltip\" title=\"Грешка в хеша.\"></span>" :
+                //"<span class=\"glyphicon glyphicon-ok text-success\" data-toggle=\"tooltip\" title=\"Валиден запис.\"></span>"
+                null
+                )).Filterable(false);
+        columns.Add(m => m.DateTime).Titled(Html.DisplayNameFor(model => model.First().DateTimeText)) //.InitialSort(GridSortOrder.Desc);
             .Encoded(false)
-            .RenderedAs(model => Html.Raw("<a href='#' class='filterBySession' data-id='" + model.SessionID + "'>" + model.SessionID + "</a>")
+            .RenderedAs(model => model.DateTimeText);
+        columns.Add(m => m.DurationTicks).Titled(Html.DisplayNameFor(model => model.First().DurationText))
+            .RenderedAs(model => model.DurationText);
+        columns.Add(m => m.AuditTypeString).Titled(Html.DisplayNameFor(model => model.First().AuditTypeOrRequestMethod))
+            .RenderedAs(model => model.AuditTypeOrRequestMethod);
+        columns.Add(m => m.IpAddress).Titled(Html.DisplayNameFor(model => model.First().IpAddress));
+        columns.Add(m => m.SessionId).Titled(Html.DisplayNameFor(model => model.First().SessionId))
+            .Encoded(false)
+            .RenderedAs(model => Html.Raw("<a href='#' class='filterBySession' data-id='" + model.SessionId + "'>" + (!string.IsNullOrEmpty(model.SessionId) ? model.SessionId.Substring(0, 8) + "..." : null) + "</a>")
             );
         columns.Add(m => m.UserName).Titled(Html.DisplayNameFor(model => model.First().UserName));
-        columns.Add(m => m.URLAccessed).Titled(Html.DisplayNameFor(model => model.First().URLAccessed));
-        columns.Add(m => m.Activity).Titled(Html.DisplayNameFor(model => model.First().Activity));
-        columns.Add(m => m.ID).Titled("").Encoded(false).RenderedAs(model => Html.Raw("<a href=\"" + Url.Action("Details", new { id = model.ID }) + "\"><span class=\"glyphicon glyphicon-eye-open\" data-toggle=\"tooltip\" title=\"детайли\"></span></a>")).Filterable(false);
+        columns.Add(m => m.UrlAccessed).Titled(Html.DisplayNameFor(model => model.First().UrlAccessed))
+            .Encoded(false)
+            .RenderedAs(model => model.UrlAccessed != null && model.UrlAccessed.Length > 30
+                ? string.Format("<span title=\"{0}\">{1}...</span>", model.UrlAccessed, model.UrlAccessed.Substring(0, 30))
+                : model.UrlAccessed);
+        columns.Add(m => m.Notes).Titled(Html.DisplayNameFor(model => model.First().Notes));
+
+        //columns.Add(m => m.Id).Titled("").Encoded(false).RenderedAs(model => Html.Raw("<a target=\"_blank\" href=\"" + Url.Action("Details", new { id = model.Id }) + "\"><span class=\"glyphicon glyphicon-eye-open\" data-toggle=\"tooltip\" title=\"детайли\"></span></a>")).Filterable(false);
+        columns.Add().Encoded(false).Css("grid-td-action-buttons").RenderedAs(model =>
+            "<div class='btn-group pull-right' role='group'>" +
+            "<a target=\"_blank\" href=\"" + Url.Action("Details", new { id = model.Id }) + "\"><span class=\"glyphicon glyphicon-eye-open\" data-toggle=\"tooltip\" title=\"детайли\"></span></a> &nbsp;" +
+            //"<a target=\"_blank\" href=\"" + Url.Action("Edit", new { id = model.Id }) + "\"><span class=\"glyphicon glyphicon-pencil\" data-toggle=\"tooltip\" title=\"корекция\"></span></a>" +
+            "</div>"
+        );
+        //columns.Add(m => m.PreviousId);
+        //columns.Add(m => m.HashString);
+        //columns.Add(m => m.HashStringCalc);
     })
     .Filterable()
     .Sortable(true)
     .Pageable(pager =>
     {
         pager.PagesToDisplay = 10;
-        pager.RowsPerPage = 10;
+        pager.RowsPerPage = 100;
     })
-    .Empty("Не са открити елементи")
-    .Css("table table-hover")
+    .Empty("Няма журнални записи")
+    .Css("table table-hover table-condensed")
 )
 
     <script>
 
         $('.filterBySession').click(function () {
-            var grid = $('.mvc-grid').data('mvc-grid');
-            grid.query = 'fromDate=' + $('#fromDate').val() + '&toDate=' + $('#toDate').val() + '&sessionID=' + $(this).data("id");
-
-            $("#sessionID").val($(this).data("id"));
-
-            $('.mvc-grid').mvcgrid({
-                reload: true
-            });
+            $("#sessionId").val($(this).data("id"));
+            filterData();
         });
     </script>

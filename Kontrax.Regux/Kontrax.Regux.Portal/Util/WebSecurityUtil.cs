@@ -4,23 +4,22 @@ using Kontrax.Regux.Model;
 using Kontrax.Regux.Service;
 using Microsoft.AspNet.Identity;
 
-public static class WebSecurityUtil
+namespace Kontrax.Regux.Portal
 {
-    public static async Task<UserPermissionsModel> GetPermissionsAsync(this IPrincipal user)
+    public static class WebSecurityUtil
     {
-        if (user == null)
+        public static async Task<UserPermissionsModel> GetPermissionsAsync(this IPrincipal user)
         {
-            return new UserPermissionsModel
+            if (user == null)
             {
-                AdminOfAdministrationIds = new int[0],
-                ManagerOfAdministrationIds = new int[0]
-            };
-        }
+                return new UserPermissionsModel(null, null, false);
+            }
 
-        string userId = user.Identity.GetUserId();
-        using (PermissionService service = new PermissionService(userId))
-        {
-            return await service.GetPermissions();
+            string userId = user.Identity.GetUserId();
+            using (PermissionService service = new PermissionService(userId))
+            {
+                return await service.GetPermissionsAsync();
+            }
         }
     }
 }

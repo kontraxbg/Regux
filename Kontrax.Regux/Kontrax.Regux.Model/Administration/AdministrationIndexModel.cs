@@ -1,17 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Kontrax.Regux.Model.Administration
 {
-    public class AdministrationIndexModel: AdministrationModel
+    public class AdministrationIndexModel: AdministrationBaseModel
     {
-        [Display(Name="Има PKI Сертификат")]
-        public bool HasCertificate { get; set; }
-        [Display(Name = "Предложен PKI Сертификат")]
-        public bool CertificateIsPending { get; set; }
+        public UserPermissionsModel CurrentUser { get; set; }
+
+        [Display(Name = "Вид")]
+        public string Kind { get; set; }
+
+        [Display(Name = "Необходими удостоверения")]
+        public int RequiredRegiXReportCount { get; set; }
+
+        [Display(Name = "Има RegiX сертификат")]
+        public bool HasRegiXCertificate { get; set; }
     }
 }

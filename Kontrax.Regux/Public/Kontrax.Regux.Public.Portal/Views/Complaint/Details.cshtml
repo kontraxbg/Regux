@@ -1,73 +1,40 @@
-﻿@model IEnumerable<Kontrax.Regux.Public.Portal.Models.ComplaintViewModel>
+﻿@model IEnumerable<Kontrax.Regux.Public.Portal.Models.SignalViewModel>
 
-@*@{ 
-    Layout = null;
-}*@
+<link href="~/Content/MvcGrid/mvc-grid.css" rel="stylesheet" async />
 
-<body class="container-fluid">
-    <table class="table table-striped">
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.SubmitDateTime)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ServiceName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.AdministrationName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.EmployeeName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IncidentDateTime)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.SenderPidTypeCode)/@Html.DisplayNameFor(model => model.SenderIdentifier)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.SenderNote)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.SenderContact)
-            </th>
-            <th></th>
-        </tr>
+<div class="container-fluid">
+    <h2 class="panel-heading text-info"><i class="fa fa-history"></i> История на подадените сигнали и предложения</h2>
+    <hr />
+    @(Html
+    .Grid(Model)
+    .Build(columns =>
+    {
+        columns.Add(m => m.ServiceType).Titled(Html.DisplayNameFor(model => model.First().ServiceType));
+        columns.Add(m => m.SubmitDateTime).Titled(Html.DisplayNameFor(model => model.First().SubmitDateTime));
+        columns.Add(m => m.ServiceName).Titled(Html.DisplayNameFor(model => model.First().ServiceName));
+        columns.Add(m => m.AdministrationName).Titled(Html.DisplayNameFor(model => model.First().AdministrationName));
+        columns.Add(m => m.EmployeeName).Titled(Html.DisplayNameFor(model => model.First().EmployeeName));
+        columns.Add(m => m.IncidentDateTime).Titled(Html.DisplayNameFor(model => model.First().IncidentDateTime));
+        columns.Add(m => m.SenderNote).Titled(Html.DisplayNameFor(model => model.First().SenderNote));
+        //columns.Add(m => m.Id).Titled("").Encoded(false).RenderedAs(model => Html.Raw("<a target=\"_blank\" href=\"" + Url.Action("Details", new { id = model.Id }) + "\"><span class=\"glyphicon glyphicon-eye-open\" data-toggle=\"tooltip\" title=\"детайли\"></span></a>")).Filterable(false);
+    })
+    .Filterable()
+    .Sortable(true)
+    .Pageable(pager =>
+    {
+        pager.PagesToDisplay = 10;
+        pager.RowsPerPage = 10;
+    })
+    .Empty("Не са открити елементи")
+    .Css("table table-hover")
+    )
+</div>
 
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td class="col-md-1">
-                    @Html.DisplayFor(modelItem => item.SubmitDateTime)
-                </td>
-                <td class="col-md-4">
-                    @Html.DisplayFor(modelItem => item.ServiceName)
-                </td>
-                <td class="col-md-1">
-                    @Html.DisplayFor(modelItem => item.AdministrationName)
-                </td>
-                <td class="col-md-1">
-                    @Html.DisplayFor(modelItem => item.EmployeeName)
-                </td>
-                <td class="col-md-1">
-                    @Html.DisplayFor(modelItem => item.IncidentDateTime)
-                </td>
-                <td class="col-md-1">
-                    @Html.DisplayFor(modelItem => item.SenderPidTypeCode)/@Html.DisplayFor(modelItem => item.SenderIdentifier)
-                </td>
-                <td class="col-md-2">
-                    @Html.DisplayFor(modelItem => item.SenderNote)
-                </td>
-                <td class="col-md-1">
-                    @Html.DisplayFor(modelItem => item.SenderContact)
-                </td>
-                @*<td>
-                        @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
-                        @Html.ActionLink("Details", "Details", new { id = item.Id }) |
-                        @Html.ActionLink("Delete", "Delete", new { id = item.Id })
-                    </td>*@
-            </tr>
-        }
-
-    </table>
-</body>
+@section scripts{
+    <script src="~/Scripts/locales/mvc-grid.bg.js"></script>
+    <script>
+        $(function () {
+            $('.mvc-grid').mvcgrid();
+        });
+    </script>
+}

@@ -1,132 +1,127 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using Kontrax.Regux.Model.Account;
+using Kontrax.Regux.Portal.Identity;
+using Kontrax.Regux.Service;
+using Kontrax.Regux.Shared.Portal.Identity;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
-using Microsoft.Owin.Security;
-using Kontrax.Regux.Portal.Models;
-using Kontrax.Regux.Service;
-using Kontrax.Regux.Portal.Attributes;
 
 namespace Kontrax.Regux.Portal.Controllers
 {
-    [Authorize]
-    [SkipChangePassword]
+    // През 2018-02 атрибутите ChangePassword и SkipChangePassword са заменени със стандартния ResetPassword процес. Виж повече в ChangePasswordAttribute.cs.
+    //[SkipChangePassword]
     public class ManageController : BaseController
     {
-        private ApplicationSignInManager _signInManager;
-        private ApplicationUserManager _userManager;
-
-        public ManageController()
+        [HttpGet]
+        public async Task<ActionResult> Index()
         {
-        }
-
-        public ManageController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
-        {
-            UserManager = userManager;
-            SignInManager = signInManager;
-        }
-
-        public ApplicationSignInManager SignInManager
-        {
-            get
+            string userId = User.Identity.GetUserId();
+            ApplicationUser user;
+            using (ApplicationUserManager userManager = CreateUserManager())
             {
-                return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
+                user = await userManager.FindByIdAsync(User.Identity.GetUserId());
             }
-            private set 
-            { 
-                _signInManager = value; 
-            }
-        }
-
-        public ApplicationUserManager UserManager
-        {
-            get
+            ManageViewModel model = new ManageViewModel
             {
-                return _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
-            }
-            private set
-            {
-                _userManager = value;
-            }
-        }
-
-        //
-        // GET: /Manage/Index
-        public async Task<ActionResult> Index(ManageMessageId? message)
-        {
-            var userId = User.Identity.GetUserId();
-            var model = new IndexViewModel
-            {
-                HasPassword = HasPassword(),
-                PhoneNumber = await UserManager.GetPhoneNumberAsync(userId),
-                TwoFactor = await UserManager.GetTwoFactorEnabledAsync(userId),
-                Logins = await UserManager.GetLoginsAsync(userId),
-                BrowserRemembered = await AuthenticationManager.TwoFactorBrowserRememberedAsync(userId),
-                StatusMessage =
-                    message == ManageMessageId.ChangePasswordSuccess ? "Your password has been changed."
-                    : message == ManageMessageId.SetPasswordSuccess ? "Your password has been set."
-                    : message == ManageMessageId.SetTwoFactorSuccess ? "Your two-factor authentication provider has been set."
-                    : message == ManageMessageId.Error ? "An error has occurred."
-                    : message == ManageMessageId.AddPhoneSuccess ? "Your phone number was added."
-                    : message == ManageMessageId.RemovePhoneSuccess ? "Your phone number was removed."
-                    : ""
+                PersonName = user.PersonName,
+                PhoneNumber = user.PhoneNumber
             };
-            return View(model);
+            return await IndexViewAsync(model, userId);
         }
 
-        //
-        // GET: /Manage/ChangePassword
-        public ActionResult ChangePassword(string reason = "")
+        [HttpPost, ValidateAntiForgeryToken]
+        public Task<ActionResult> Index(ManageViewModel model)
         {
-            ChangePasswordViewModel model = new ChangePasswordViewModel()
-            {
-                Reason = reason
-            };
-            return View(model);
-        }
-
-        //
-        // POST: /Manage/ChangePassword
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> ChangePassword(ChangePasswordViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-            var result = await UserManager.ChangePasswordAsync(User.Identity.GetUserId(), model.OldPassword, model.NewPassword);
-            if (result.Succeeded)
-            {
-                var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
-                if (user != null)
+            string userId = User.Identity.GetUserId();
+            return TryAsync(
+                async () =>
                 {
-                    await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
-                    using (var userManagementService = new UserManagementService())
+                    using (ApplicationUserManager userManager = CreateUserManager())
                     {
-                        user.ChangePassword = false;
-                        UserManager.Update(user);
+                        ApplicationUser user = await userManager.FindByIdAsync(userId);
+                        user.PersonName = model.PersonName;
+                        user.PhoneNumber = model.PhoneNumber;
+                        await userManager.UpdateAsync(user);
                     }
-                }
-                return RedirectToAction("Index", new { Message = ManageMessageId.ChangePasswordSuccess });
+                },
+                () => RedirectToAction(nameof(Index)),
+                () => IndexViewAsync(model, userId)
+            );
+        }
+
+        private async Task<ActionResult> IndexViewAsync(ManageViewModel model, string userId)
+        {
+            model.CurrentUser = await User.GetPermissionsAsync();
+            using (UserManagementService service = new UserManagementService())
+            {
+                model.View = await service.GetUserAsync(userId);
             }
-            AddErrors(result);
             return View(model);
         }
 
-        //
-        // GET: /Manage/SetPassword
+        public ActionResult ChangePassword(bool? renew, string returnUrl)
+        {
+            ChangePasswordModel model = new ChangePasswordModel();
+            if (renew ?? false)
+            {
+                Warning("Паролата трябва да бъде променена.");
+            };
+            return View(model);
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<ActionResult> ChangePassword(ChangePasswordModel model, string returnUrl)
+        {
+            _successMessage = "Паролата е променена успешно.";
+            return await TryAsync(
+                async () =>
+                {
+                    string userId = User.Identity.GetUserId();
+                    using (ApplicationUserManager userManager = CreateUserManager())
+                    {
+                        DemandSuccess(await userManager.ChangePasswordAsync(userId, model.OldPassword, model.NewPassword));
+
+                        ApplicationUser user = await userManager.FindByIdAsync(userId);
+                        using (ApplicationSignInManager signInManager = HttpContext.GetOwinContext().Get<ApplicationSignInManager>())
+                        {
+                            await signInManager.SignInAsync(user);
+                        }
+
+                        // idilov: Това защо е нужно?
+                        DemandSuccess(await userManager.UpdateAsync(user));
+                    }
+                },
+                () =>
+                {
+                    if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                    {
+                        return Redirect(returnUrl);
+                    }
+                    return RedirectToAction(nameof(Index));
+                },
+                () => View(model)
+            );
+        }
+
+        private static void DemandSuccess(IdentityResult result)
+        {
+            if (!result.Succeeded)
+            {
+                throw new Exception(string.Join(Environment.NewLine, result.Errors));
+            }
+        }
+
+        /* Няма такъв процес в този проект.
         public ActionResult SetPassword()
         {
             return View();
         }
 
-        //
-        // POST: /Manage/SetPassword
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> SetPassword(SetPasswordViewModel model)
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<ActionResult> SetPassword(SetPasswordModel model)
         {
             if (ModelState.IsValid)
             {
@@ -136,7 +131,7 @@ namespace Kontrax.Regux.Portal.Controllers
                     var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
                     if (user != null)
                     {
-                        await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+                        await SignInManager.SignInAsync(user);
                     }
                     return RedirectToAction("Index", new { Message = ManageMessageId.SetPasswordSuccess });
                 }
@@ -145,35 +140,6 @@ namespace Kontrax.Regux.Portal.Controllers
 
             // If we got this far, something failed, redisplay form
             return View(model);
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && _userManager != null)
-            {
-                _userManager.Dispose();
-                _userManager = null;
-            }
-
-            base.Dispose(disposing);
-        }
-
-        #region Helpers
-
-        private IAuthenticationManager AuthenticationManager
-        {
-            get
-            {
-                return HttpContext.GetOwinContext().Authentication;
-            }
-        }
-
-        private void AddErrors(IdentityResult result)
-        {
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError("", error);
-            }
         }
 
         private bool HasPassword()
@@ -185,18 +151,6 @@ namespace Kontrax.Regux.Portal.Controllers
             }
             return false;
         }
-
-        public enum ManageMessageId
-        {
-            AddPhoneSuccess,
-            ChangePasswordSuccess,
-            SetTwoFactorSuccess,
-            SetPasswordSuccess,
-            RemoveLoginSuccess,
-            RemovePhoneSuccess,
-            Error
-        }
-
-        #endregion
+        */
     }
 }

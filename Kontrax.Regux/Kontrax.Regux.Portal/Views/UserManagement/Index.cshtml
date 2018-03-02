@@ -1,4 +1,6 @@
-﻿@model Kontrax.Regux.Model.UserManagement.UsersViewModel
+﻿@using Kontrax.Regux.Model
+
+@model Kontrax.Regux.Model.UserManagement.UsersViewModel
 
 @{
     ViewBag.Title = "Потребители";
@@ -6,82 +8,151 @@
 
 @section Subtitle {
     @Html.ActionLink("Назад към администриране", "Index", "Admin")
+    @if (Model.CurrentUser.CanAddEmployees)
+    {
+        <div class="pull-right">
+            <a class="btn btn-default" href="@Url.Action("Create", new { admId = Model.AdministrationId, level = Model.UserTypeCode })">
+                <span class="glyphicon glyphicon-plus"></span> Добавяне на потребител
+            </a>
+        </div>
+        <div class="clearfix"></div>
+    }
 }
 
-<div class="panel panel-info">
-    <div class="panel-heading"></div>
-    <div class="panel-body">
-        @using (Html.BeginForm())
-        {
-            @Html.AntiForgeryToken()
+@helper HeaderRow()
+{
+    <thead>
+        <tr>
+            <th class="col-md-3 col-sm-3">
+                @Html.DisplayNameFor(model => model.Users[0].UserName)<br />
+                <i>@Html.DisplayNameFor(model => model.Users[0].PersonName)</i>
+            </th>
+            <th class="col-md-3 col-sm-3">
+                @Html.DisplayNameFor(model => model.Users[0].Email)<br />
+                <i>@Html.DisplayNameFor(model => model.Users[0].PhoneNumber)</i>
+            </th>
+            <th class="col-md-1 col-sm-1">
+                @Html.DisplayNameFor(model => model.Users[0].IsEAuthEnabled)<br />
+                <i>@Html.DisplayNameFor(model => model.Users[0].PersonIdentifier)</i>
+            </th>
+            <th class="col-md-6 col-sm-6">
+                <table class="col-md-12 row">
+                    <tr>
+                        <th valign="bottom" class="col-md-6">@Html.DisplayNameFor(model => model.Users[0].Workplaces.First().AdministrationName)</th>
+                        <th valign="bottom" class="col-md-3">@Html.DisplayNameFor(model => model.Users[0].Workplaces.First().AccessLevelName)</th>
+                        <th valign="bottom" class="col-md-3">@Html.DisplayNameFor(model => model.Users[0].Workplaces.First().LocalRoleName)</th>
+                    </tr>
+                </table>
+            </th>
+            @if (Model.CurrentUser.CanAddEmployees)
+            {
+                <th></th>
+            }
+        </tr>
+    </thead>
+}
+
+@section OverlayHeader {
+    @* Това е компактен дубликат на table header-а. Той се показва най-горе при скролиране на дългия списък. *@
+    <div data-threshold="380" class="panel panel-info" style="margin-bottom: 0">
+        <div class="panel-body" style="padding-top: 0; padding-bottom: 0;">
+            <table class="table" style="margin-bottom: 0;">
+                @HeaderRow()
+            </table>
+        </div>
+    </div>
+}
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="panel panel-info">
+        <div class="panel-heading">@Html.DisplayNameFor(model => model.AdministrationId)</div>
+        <div class="panel-body">
+            @Html.DropDownListFor(model => model.AdministrationId, new SelectList(Model.Administrations, "Id", "Name"), "(всички)", new { @class = "form-control select2-search-select" })
+            @Html.ValidationMessageFor(model => model.AdministrationId, null, new { @class = "text-danger" })
+        </div>
+        <div class="panel-heading"></div>
+        <div class="panel-body">
             <div class="form-horizontal">
                 <div class="form-group">
-                    @Html.LabelFor(model => model.AdministrationId, new { @class = "control-label col-md-2" })
-                    <div class="col-md-6">
-                        @Html.DropDownListFor(model => model.AdministrationId, new SelectList(Model.Administrations, "Id", "Name"), "(всички)", new { @class = "form-control" })
-                        @Html.ValidationMessageFor(model => model.AdministrationId)
+                    @Html.LabelFor(model => model.NameIdOrContact, new { @class = "control-label col-md-2" })
+                    <div class="col-md-3">
+                        @Html.EditorFor(model => model.NameIdOrContact, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.NameIdOrContact, null, new { @class = "text-danger" })
                     </div>
-                    @Html.LabelFor(model => model.LocalRoleCode, new { @class = "control-label col-md-2" })
+                    @Html.LabelFor(model => model.UserTypeCode, new { @class = "control-label col-md-2" })
                     <div class="col-md-2">
-                        @Html.DropDownListFor(model => model.LocalRoleCode, new SelectList(Model.LocalRoles, "Code", "Name"), "(всички)", new { @class = "form-control" })
-                        @Html.ValidationMessageFor(model => model.LocalRoleCode)
+                        @Html.DropDownListFor(model => model.UserTypeCode, new SelectList(Model.UserTypes, "Code", "Name"), "(всички)", new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.UserTypeCode, null, new { @class = "text-danger" })
                     </div>
-                </div>
-                <div class="form-group">
                     <div class="col-md-3">
                         <input class="col-md-12 btn btn-primary" type="submit" value="Търсене" />
                     </div>
                 </div>
             </div>
-        }
+        </div>
     </div>
-    <div class="panel-heading"></div>
+}
+<div class="panel panel-info">
+    <div class="panel-heading">
+        @Html.DisplayFor(model => model.ResultTitle)
+    </div>
     <div class="panel-body">
         @if (Model.Users != null)
         {
             <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>@Html.DisplayNameFor(model => model.Users.First().UserName)</th>
-                        <th>@Html.DisplayNameFor(model => model.Users.First().PersonName)</th>
-                        <th>@Html.DisplayNameFor(model => model.Users.First().Email)</th>
-                        <th>@Html.DisplayNameFor(model => model.Users.First().PhoneNumber)</th>
-                        <th>@Html.DisplayNameFor(model => model.Users.First().AdministrationName)</th>
-                        <th>@Html.DisplayNameFor(model => model.Users.First().LocalRoleName)</th>
-                        <th>
-                            @if (Model.CurrentUser.CanAddEmployees)
-                            {
-                                @Html.ActionLink("Добавяне", "Create", new { administrationId = Model.AdministrationId }, new { @class = "btn btn-sm btn-default pull-right" })
-                            }
-                        </th>
-                    </tr>
-                </thead>
+                @HeaderRow()
+
                 <tbody>
                     @foreach (var user in Model.Users)
                     {
-                        <tr class="@(user.IsGlobalAdmin ? "success" : null)">
-                            <td>@Html.DisplayFor(_ => user.UserName)</td>
-                            <td>@Html.DisplayFor(_ => user.PersonName)</td>
-                            <td>@Html.DisplayFor(_ => user.Email)</td>
-                            <td>@Html.DisplayFor(_ => user.PhoneNumber)</td>
-                            <td>@Html.DisplayFor(_ => user.AdministrationName)</td>
+                        <tr class="@(user.IsBanned ? "danger" : user.IsGlobalAdmin ? "success" : null)"
+                            title="@(user.IsBanned ? "Потребителят е блокиран." : user.IsGlobalAdmin ? "Потребителят е " + Kontrax.Regux.Model.Role.GlobalAdminName + "." : null)">
                             <td>
-                                @Html.DisplayFor(_ => user.LocalRoleName)
-                                @if (user.IsGlobalAdmin)
-                                {
-                                    if (!string.IsNullOrEmpty(user.LocalRoleName))
+                                @Html.DisplayFor(_ => user.UserName)<br />
+                                <i>@Html.DisplayFor(_ => user.PersonName)</i>
+                            </td>
+                            <td>
+                                @Html.DisplayFor(_ => user.Email)<br />
+                                <i>@Html.DisplayFor(_ => user.PhoneNumber)</i>
+                            </td>
+                            <td>
+                                @Html.DisplayFor(_ => user.IsEAuthEnabled)<br />
+                                <i>
+                                    @if (!string.IsNullOrEmpty(user.PidType) && user.PidType != "ЕГН")
                                     {
-                                        <br />
+                                        @Html.DisplayFor(_ => user.PidType)
+                                        @(" ")
                                     }
-                                    @Html.DisplayNameFor(_ => user.IsGlobalAdmin)
-                                }
+                                    @Html.DisplayFor(_ => user.PersonIdentifier)
+                                </i>
                             </td>
                             <td>
-                                @if (Model.CurrentUser.CanAddEmployees)
-                                {
-                                    @Html.ActionLink("Редактиране", "Edit", new { id = user.Id }, new { @class = "btn btn-sm btn-default pull-right" })
-                                }
+                                <table class="col-md-12 row">
+                                    @if (user.IsGlobalAdmin)
+                                    {
+                                        <tr>
+                                            <td valign="top" class="col-md-6">*</td>
+                                            <td valign="top" class="col-md-6">@Html.DisplayNameFor(_ => user.IsGlobalAdmin)</td>
+                                        </tr>
+                                    }
+                                    @foreach (var workplace in user.Workplaces)
+                                    {
+                                        <tr>
+                                            <td valign="top" class="col-md-6">@Html.DisplayFor(_ => workplace.AdministrationName)</td>
+                                            <td valign="top" class="col-md-3">@Html.DisplayFor(_ => workplace.AccessLevelName)</td>
+                                            <td valign="top" class="col-md-3" title="@(workplace.LocalRoleName == "*" ? LocalRoleName.None : null)">@Html.DisplayFor(_ => workplace.LocalRoleName)</td>
+                                        </tr>
+                                    }
+                                </table>
                             </td>
+                            @if (Model.CurrentUser.CanAddEmployees)
+                            {
+                                <td>
+                                    <a href="@Url.Action("Edit", new { id = user.Id })"><span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="редактиране"></span></a>
+                                </td>
+                            }
                         </tr>
                     }
                 </tbody>
@@ -89,3 +160,7 @@
         }
     </div>
 </div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

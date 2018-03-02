@@ -10,28 +10,28 @@
 <div class="row">
     <div class="col-md-6">
         <div class="panel panel-info">
-            <div class="panel-heading">Сигурност</div>
+            <div class="panel-heading">Потребители</div>
             <div class="panel-body">
                 <div class="btn-group-vertical col-md-12">
-                    @Html.ActionLink("Управление на потребителите", "Index", "UserManagement", null, new { @class = "btn btn-default" })
-                    @Html.ActionLink("Одит", "Index", "Audit", null, new { @class = "btn btn-default" })
+                    @Html.ActionLink("Служители на администрации", "Index", "UserManagement", null, new { @class = "btn btn-default" })
+                    @Html.ActionLink("Граждани, подавали сигнали", "Index", "Citizen", null, new { @class = "btn btn-default" })
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-md-6">
-        <div class="panel panel-info">
-            <div class="panel-heading">Настройки</div>
-            <div class="panel-body">
-                <div class="btn-group-vertical col-md-12">
-                    @if (Model.IsGlobalAdmin)
-                    {
+    @if (Model.IsGlobalAdmin)
+    {
+        <div class="col-md-6">
+            <div class="panel panel-info">
+                <div class="panel-heading">Настройки</div>
+                <div class="panel-body">
+                    <div class="btn-group-vertical col-md-12">
                         @Html.ActionLink("Изпращане на електронна поща", "Smtp", "GlobalAdmin", null, new { @class = "btn btn-default" })
-                    }
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    }
 </div>
 
 <div class="row">
@@ -40,14 +40,27 @@
             <div class="panel-heading">Номенклатури</div>
             <div class="panel-body">
                 <div class="btn-group-vertical col-md-12">
-                    @if (Model.IsGlobalAdmin)
-                    {
-                        @Html.ActionLink("Администрации", "Index", "Administration", null, new { @class = "btn btn-default" })
-                    }
+                    @Html.ActionLink("RegiX удостоверения", "Index", "RegiXReport", null, new { @class = "btn btn-default" })
+                    @Html.ActionLink("Административни услуги", "Index", "Service", null, new { @class = "btn btn-default" })
+                    <hr />
+                    @Html.ActionLink("Администрации", "Index", "Administration", new { psp = false }, new { @class = "btn btn-default" })
+                    @Html.ActionLink("Доставчици на обществени услуги", "Index", "Administration", new { psp = true }, new { @class = "btn btn-default" })
                 </div>
             </div>
         </div>
     </div>
+    @if (Model.IsGlobalAdmin)
+    {
+        <div class="col-md-6">
+            <div class="panel panel-info">
+                <div class="panel-heading">Обновяване от други системи</div>
+                <div class="panel-body">
+                    <div class="btn-group-vertical col-md-12">
+                        @Html.ActionLink("Обновяване от RegiX", "UpdateRegiXReports", "RegiXReport", null, new { @class = "btn btn-default" })
+                        @Html.ActionLink("Обновяване от ИИСДА", "Index", "Iisda", null, new { @class = "btn btn-default" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 </div>
-    
-

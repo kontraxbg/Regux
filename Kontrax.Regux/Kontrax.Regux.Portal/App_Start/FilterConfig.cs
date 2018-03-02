@@ -1,6 +1,6 @@
-﻿using Kontrax.Regux.Portal.Attributes;
-using System.Web;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
+using Kontrax.Regux.Portal.Attributes;
+using Kontrax.Regux.Portal.Audit;
 
 namespace Kontrax.Regux.Portal
 {
@@ -9,7 +9,12 @@ namespace Kontrax.Regux.Portal
         public static void RegisterGlobalFilters(GlobalFilterCollection filters)
         {
             filters.Add(new HandleErrorAttribute());
-            filters.Add(new ChangePasswordAttribute());
+
+            // През 2018-02 атрибутите ChangePassword и SkipChangePassword са заменени със стандартния ResetPassword процес.  Виж повече в ChangePasswordAttribute.cs.
+            //filters.Add(new ChangePasswordAttribute());  // Наследява AuthorizeAttribute.
+            filters.Add(new AuthorizeAttribute());
+
+            filters.Add(new AuditAttribute() { AuditType = Model.Audit.AuditTypeCode.Read, AuditLevel = AuditLevel.Form });
         }
     }
 }

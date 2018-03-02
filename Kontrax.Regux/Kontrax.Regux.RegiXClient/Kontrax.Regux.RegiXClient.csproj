@@ -35,6 +35,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml" />
@@ -45,6 +46,10 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
+    <Compile Include="EAuth\EAuthEndpointBehavior.cs" />
+    <Compile Include="Model\CallContext.cs" />
+    <Compile Include="Model\RegiXResponse.cs" />
+    <Compile Include="Model\DataNode.cs" />
     <Compile Include="Model\Xsd.cs" />
     <Compile Include="Model\XsdAny.cs" />
     <Compile Include="Model\XsdGroup.cs" />
@@ -54,7 +59,10 @@
     <Compile Include="Model\XsdObject.cs" />
     <Compile Include="Model\XsdType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="EAuth\EAuthMessageInspector.cs" />
     <Compile Include="RegiXUtil.cs" />
+    <Compile Include="XmlBuilder.cs" />
+    <Compile Include="XsdParser.cs" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
@@ -83,6 +91,12 @@
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Kontrax.Xml\Kontrax.Xml.csproj">
+      <Project>{1c5e7709-cf68-469d-a88c-1bba4677644a}</Project>
+      <Name>Kontrax.Xml</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

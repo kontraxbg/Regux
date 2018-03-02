@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Web;
+using System.Net;
+using System.Web.Configuration;
+using System.Web.Helpers;
 using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
-using System.ComponentModel.DataAnnotations;
-using Kontrax.Regux.Portal.Adapters;
 using Kontrax.Regux.Portal.Attributes;
-using System.Net;
-using System.Web.Helpers;
+using Kontrax.Regux.Shared.Portal.Adapters;
 
 namespace Kontrax.Regux.Portal
 {
@@ -22,6 +20,12 @@ namespace Kontrax.Regux.Portal
             ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;
             ServicePointManager.SecurityProtocol &= ~(SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls | SecurityProtocolType.Tls11);
 
+            // Изключва валидирането на SSL сертификатите на останалите системи, с които си комуникира тази.
+            // Трябва да се използва само за тестови цели преди необходимите издатели да се инсталират в Trusted Root CAs.
+            if (WebConfigurationManager.AppSettings["DisableServerCertificateValidation"] == bool.TrueString)
+            {
+                ServicePointManager.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
+            }
 
             // Регистриране само на Razor View Engine
             ViewEnginesConfiguration();

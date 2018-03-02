@@ -1,62 +1,120 @@
-﻿@model IEnumerable<Kontrax.Regux.Model.Administration.AdministrationIndexModel>
+﻿@model Kontrax.Regux.Model.Administration.AdministrationsViewModel
 
 @{
-    ViewBag.Title = "Списък с администрации";
+    ViewBag.Title = Model.IsPublicServiceProvider ? "Доставчици на обществени услуги" : "Списък с администрации";
+    string lastKind = null;
+    int kindIndex = 0;
 }
 
-@helper ShowTree(IEnumerable<Kontrax.Regux.Model.Administration.AdministrationIndexModel> items)
+@section Subtitle {
+    @Html.ActionLink("Назад към администриране", "Index", "Admin")
+    @if (Model.CurrentUser.IsGlobalAdmin)
+    {
+        <div class="pull-right">
+            <a class="btn btn-default" href="@Url.Action("Create", new { psp = Model.IsPublicServiceProvider })">
+                <span class="glyphicon glyphicon-plus"></span> Добавяне на @(Model.IsPublicServiceProvider ? "доставчик на обществени услуги" : "администрация")
+            </a>
+        </div>
+    }
+    <div class="clearfix"></div>
+}
+
+@helper HeaderRow()
 {
-        foreach (var item in items)
-        {
-
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Code)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ParentId)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.HasCertificate)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.CertificateIsPending)
-                </td>
-                <td>
-                    <div class="text-nowrap">
-                        <a href="@Url.Action("Details", new { id=item.Id })"><span class="glyphicon glyphicon-eye-open" data-toggle="tooltip" title="детайли"></span></a>
-                        <a href="@Url.Action("Edit", new { id=item.Id })"><span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="редакция"></span></a>
-                        <a href="@Url.Action("Delete", new { id=item.Id })"><span class="glyphicon glyphicon-trash" data-toggle="tooltip" title="изтрий"></span></a>
-                    </div>
-                </td>
-            </tr>
-
-             @ShowTree(Model.Where(i=>i.ParentId == item.Id))
-        }
+    <tr>
+        <th class="col-md-9 col-sm-9">@Html.DisplayNameFor(model => model.Administrations[0].Name)</th>
+        <th class="small col-md-1 col-sm-1">@Html.DisplayNameFor(model => model.Administrations[0].RequiredRegiXReportCount)</th>
+        <th class="small col-md-1 col-sm-1">@Html.DisplayNameFor(model => model.Administrations[0].HasRegiXCertificate)</th>
+    </tr>
 }
 
-<table class="table table-hover">
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.Code)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.ParentId)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Name)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.HasCertificate)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.CertificateIsPending)
-        </th>
-        <th></th>
-    </tr>
+@section OverlayHeader {
+    @* Това е компактен дубликат на table header-а. Той се показва най-горе при скролиране на дългия списък. *@
+    <div class="panel panel-info" style="margin-bottom: 0">
+        <div class="panel-body" style="padding-top: 0; padding-bottom: 0;">
+            <table class="table" style="margin-bottom: 0;">
+                @HeaderRow()
+            </table>
+        </div>
+    </div>
+}
 
-    @ShowTree(Model.Where(i=>i.ParentId == null))
-</table>
+<div class="panel panel-info">
+    <div class="panel-heading form-horizontal">
+        <div class="row">
+            <label class="col-md-1 control-label">Търсене:</label>
+            <div class="col-md-11">
+                <input id="searchFilter" class="form-control" />
+            </div>
+        </div>
+    </div>
+    <div class="panel-body">
+        <table class="table table-hover">
+            @HeaderRow()
+
+            @foreach (var administration in Model.Administrations)
+            {
+                // Само администрациите имат видове.
+                if (!Model.IsPublicServiceProvider && administration.Kind != lastKind)
+                {
+                    kindIndex++;
+                    <tr class="filtered-header" data-kind="@kindIndex">
+                        <td colspan="4">+ @Html.DisplayFor(_ => administration.Kind)</td>
+                    </tr>
+                    lastKind = administration.Kind;
+                }
+                <tr data-kind="@kindIndex" class="filtered-row @(administration.IsClosed ? "danger" : null)" title="@(administration.IsClosed ? Html.DisplayNameFor(_ => administration.IsClosed) : null)">
+                    <td>
+                        &nbsp;&nbsp;&nbsp;&nbsp;-
+                        @if (administration.RequiredRegiXReportCount > 0)
+                        {
+                            <b>@Html.ActionLink(administration.Name, "Details", new { id = administration.Id })</b>
+                        }
+                        else
+                        {
+                            @Html.ActionLink(administration.Name, "Details", new { id = administration.Id })
+                        }
+                    </td>
+                    <td>
+                        @if (administration.RequiredRegiXReportCount > 0)
+                        {
+                            <b>@Html.DisplayFor(_ => administration.RequiredRegiXReportCount)</b>
+                        }
+                    </td>
+                    <td>@Html.DisplayFor(_ => administration.HasRegiXCertificate)</td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    @*@Scripts.Render("~/bundles/jqueryval")*@
+
+    <script>
+        var rows = $("tr.filtered-row");
+        var headers = $("tr.filtered-header");
+
+        $("#searchFilter").keyup(function () {
+            var data = this.value;
+            app.delay(function () {
+                if (this.value != "") {
+                    headers.hide();
+                    rows.hide();
+                    rows.filter(function (i, v) {
+                        return $(this).is(":Contains('" + data + "')");
+                    }).show();
+                    // Показват се само секциите с поне един видим ред от същия вид.
+                    headers.filter(function (i, v) {
+                        var kindIndex = $(this).data("kind");
+                        return $("tr.filtered-row[data-kind=" + kindIndex + "]:visible").length > 0;
+                    }).show();
+                }
+                else {
+                    headers.show();
+                    rows.show();
+                }
+            }, 500);
+        });
+    </script>
+}

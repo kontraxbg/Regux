@@ -1,112 +1,112 @@
 ﻿@model Kontrax.Regux.Public.Portal.Models.ComplaintModel
 @using BotDetect.Web.Mvc;
 
-<div class="container body-content">
-    <h2 class="panel-heading">Форма за подаване на сигнал</h2>
+<div class="body-content jumbotron">
+    <h2 class="panel-heading text-warning"><i class="fa fa-exclamation-triangle"></i> Форма за подаване на сигнал</h2>
+    <hr />
     @using (Html.BeginForm("Create", "Complaint", FormMethod.Post, new { id = "complaintForm" }))
     {
-        <div class="form-group row" style="margin-top:20px;">
-            <label class="col-sm-2 col-form-label">Услуга</label>
-            @*@Html.LabelFor(model => model.ServiceId, htmlAttributes: new { @class = "control-label col-md-2" })*@
-            <div class="col-md-9">@Html.DropDownListFor(model => model.ServiceId, Model.Services, htmlAttributes: new { @class = "form-control chosen-search-select" })</div>
-        </div>
-
-        <div class="form-group row" style="margin-top:20px;">
-            <label class="col-sm-2 col-form-label">Администрация</label>
-            @*@Html.LabelFor(model => model.AdministrationId, htmlAttributes: new { @class = "control-label col-md-2" })*@
-            <div class="col-md-9">@Html.DropDownListFor(model => model.AdministrationId, Model.Administrations, null, new { @class = "form-control chosen-search-select" })</div>
-        </div>
-            <div class="form-group row" style="margin-top:20px;">
-                <label class="col-sm-2 col-form-label">Служител</label>
-                @*@Html.LabelFor(model => model.EmployeeId, htmlAttributes: new { @class = "control-label col-md-2" })*@
-                <div class="col-md-9">@Html.DropDownListFor(model => model.EmployeeId, Model.Employees, null, new { @class = "form-control chosen-search-select" })</div>
+        <div class="form-group row required" style="margin-top:20px;">
+            @Html.LabelFor(model => model.AdministrationId, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-9">
+                @Html.DropDownListFor(model => model.AdministrationId, Model.Administrations, null, new
+           {
+               @class = "form-control select2-search-select",
+               @data_bind = "value: Id"
+           })
+                @Html.ValidationMessageFor(model => model.AdministrationId, null, new { @class = "text-danger" })
             </div>
-            <div class="form-group row" style="margin-top:20px;">
-                <label class="col-sm-2 col-form-label">Време на събитието</label>
-                @*@Html.LabelFor(model => model.EmployeeId, htmlAttributes: new { @class = "control-label col-md-2" })*@
-                <div class="col-md-9">@Html.EditorFor(model => model.IncidentDateTime, new { htmlAttributes = new { @class = "form-control datetimepicker" } })</div>
+        </div>
+        <div class="form-group row required" style="margin-top:20px;">
+            @Html.LabelFor(model => model.ServiceId, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-9">
+                @Html.DropDownListFor(model => model.ServiceId, Enumerable.Empty<SelectListItem>(), htmlAttributes: new
+           {
+               @class = "form-control select2-search-select",
+               @data_bind = "options: Services, optionsValue: 'Id', optionsText: 'Name', optionsAfterRender: setOptionStyling"
+           })
+                <!-- TODO: Fix HtmlHelper to work with all select lists -->
+                @*@Html.KnockoutDropDownListFor(model => model.ServiceId, "Id", "Services", "Name", "Id", false, "")*@
+                @Html.ValidationMessageFor(model => model.ServiceId, null, new { @class = "text-danger" })
             </div>
+        </div>
+        <div class="form-group row" style="margin-top:20px;">
+            @Html.LabelFor(model => model.EmployeeId, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-9">
+                @Html.DropDownListFor(model => model.EmployeeId, Enumerable.Empty<SelectListItem>(), null, new
+           {
+               @class = "form-control select2-search-select",
+               @data_bind = "options: Employees, optionsValue: 'Id', optionsText: 'Name', optionsCaption: 'Изберете служител... (опционално)'"
+           })
+                @*@Html.KnockoutDropDownListFor(model => model.EmployeeId, "Id", "Employees", "Name", "Id", false, "")*@
+                @Html.ValidationMessageFor(model => model.EmployeeId, null, new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group row required" style="margin-top:20px;">
+            @Html.LabelFor(model => model.IncidentDateTime, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-9">
+                @Html.EditorFor(model => model.IncidentDateTime, new { htmlAttributes = new { @class = "form-control datetimepicker" } })
+                @Html.ValidationMessageFor(model => model.IncidentDateTime, null, new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group row">
+            @Html.LabelFor(model => model.SenderNote, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-9">
+                @Html.TextAreaFor(model => model.SenderNote, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.SenderNote, null, new { @class = "text-danger" })
+            </div>
+        </div>
+        <hr />
+        <div id="personalInfo">
             <div class="form-group row">
-                <label class="col-sm-2 col-form-label">Описание</label>
-                @*@Html.LabelFor(model => model.SenderNote, htmlAttributes: new { @class = "control-label col-md-2" })*@
+                @Html.LabelFor(model => model.SenderContact, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-9">
-                    @Html.TextAreaFor(model => model.SenderNote, new { @class = "form-control" })
+                    @Html.TextAreaFor(model => model.SenderContact, new { @class = "form-control" })
                 </div>
             </div>
-            @*<div class="form-group row">
-                <label class="col-sm-2 col-form-label">Анонимно</label>
-                <div class="col-md-1">
-                    @Html.CheckBoxFor(model => model.IsAnonymous, new { @class = "form-control form-check-input", @onclick = "MakeAnonymous()" })
-                </div>
-                <input id="getAnonymous" value="false" hidden="hidden" />
-            </div>*@
+        </div>
+        <hr />
+        <div class="form-group row required" style="margin-top:20px;">
+            <label class="col-sm-2 control-label">Попълнете CAPTCHA</label>
+            @{ MvcCaptcha exampleCaptcha = new MvcCaptcha("ExampleCaptcha"); }
+            <div class="col-md-6">
+                @Html.TextBox("CaptchaCode", null, new { @class = "form-control" })
+                @Html.ValidationSummary(null, new { @class = "text-danger" })
+            </div>
+            <div class="col-md-3">
+                @Html.Captcha(exampleCaptcha)
+            </div>
+        </div>
 
-            <hr />
-            <div id="personalInfo">
-                <div class="form-group row">
-                    <label class="col-sm-2 col-form-label">Вид идентификатор</label>
-                    @*@Html.LabelFor(model => model.SenderIdentifier, htmlAttributes: new { @class = "control-label col-md-2" })*@
-                    <div class="col-md-4">@Html.DropDownListFor(model => model.SenderPidTypeCode, Model.PidTypes, null, new { @class = "form-control chosen-select no-search" })</div>
-                    <div class="col-md-5">@Html.EditorFor(model => model.SenderIdentifier, new { htmlAttributes = new { @class = "form-control" } })</div>
-                </div>
-                <div class="form-group row">
-                    <label class="col-sm-2 col-form-label">Данни за контакт</label>
-                    @*@Html.LabelFor(model => model.SenderNote, htmlAttributes: new { @class = "control-label col-md-2" })*@
-                    <div class="col-md-9">
-                        @Html.TextAreaFor(model => model.SenderContact, new { @class = "form-control" })
-                    </div>
-                </div>
+        <div class="form-group row">
+            <div class="col-sm-5">
+                <button type="submit" class="btn btn-default">Изпрати</button>
             </div>
-            <hr />
-
-            <div class="form-group row" style="margin-top:20px;">
-                <label class="col-sm-2 col-form-label">Попълнете CAPTCHA</label>
-                @*@Html.LabelFor(model => model.SenderNote, htmlAttributes: new { @class = "control-label col-md-2" })*@
-                @{ MvcCaptcha exampleCaptcha = new MvcCaptcha("ExampleCaptcha"); }
-                <div class="col-md-6">
-                    @Html.TextBox("CaptchaCode", null, new { @class = "form-control" })
-                </div>
-                <div class="col-md-3">
-                    @Html.Captcha(exampleCaptcha)
-                </div>
-            </div>
-
-            <div class="form-group row">
-                <div class="col-sm-5">
-                    <button type="submit" class="btn btn-primary">Изпрати</button>
-                </div>
-            </div>
-                    }
+        </div>
+                }
 </div>
 
 @section Scripts{
-    <script>
-        function MakeAnonymous() {
-            var getAnonymous = $('#getAnonymous');
-            value = getAnonymous.val() === 'true' || (getAnonymous.val() === 'false' ? false : getAnonymous.val());
+    @Scripts.Render("~/bundles/knockout")
+    @Scripts.Render("~/Scripts/Complaint/ComplaintViewModel.js")
 
-            // Ако не е анонимен сигнал
-            if (value) {
-                value = false;
-                getAnonymous.val(value);
-                $('#personalInfo').show();
-            }
-            // Ако е анонимен сигнал
-            else {
-                value = true;
-                getAnonymous.val(value);
-                $('#personalInfo').hide();
-            }
-        }
+    <script>
+        var viewModel;
+        var getEmployees = '@Url.Action("GetEmployeesForAdministration", "Employee", null)';
+        var getServices = '@Url.Action("GetServicesForAdministration", "Complaint", null)';
 
         $(document).ready(function () {
-            $('.chosen-search-select').chosen();
-            $('.chosen-select').chosen({
-                "disable_search": true
-            });
             $('.datetimepicker').datetimepicker({
-                locale: 'bg'
+                locale: 'bg',
+                format: 'DD.MM.YYYY HH:mm'
             });
+
+            $('.select2-search-select').select2({
+                "theme": "bootstrap"
+            });
+
+            viewModel = new ComplaintViewModel(getEmployees, getServices);
+            viewModel.Init("complaintForm");
         });
     </script>
 }

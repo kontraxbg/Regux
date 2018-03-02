@@ -17,11 +17,13 @@ namespace Kontrax.Regux.Data
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public AspNetUser()
         {
-            this.Requests = new HashSet<Request>();
             this.Signals = new HashSet<Signal>();
-            this.UserLocalRoles = new HashSet<UserLocalRole>();
             this.AspNetRoles = new HashSet<AspNetRole>();
             this.Audits = new HashSet<Audit>();
+            this.Signals1 = new HashSet<Signal>();
+            this.Workplaces = new HashSet<Workplace>();
+            this.Batches = new HashSet<Batch>();
+            this.EAuths = new HashSet<EAuth>();
         }
     
         public string Id { get; set; }
@@ -37,18 +39,26 @@ namespace Kontrax.Regux.Data
         public int AccessFailedCount { get; set; }
         public string UserName { get; set; }
         public string PersonName { get; set; }
-        public bool ChangePassword { get; set; }
         public byte[] Certificate { get; set; }
+        public string PidTypeCode { get; set; }
+        public Nullable<bool> IsApproved { get; set; }
+        public bool IsBanned { get; set; }
+        public string PersonIdentifier { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Request> Requests { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Signal> Signals { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<UserLocalRole> UserLocalRoles { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<AspNetRole> AspNetRoles { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Audit> Audits { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Signal> Signals1 { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Workplace> Workplaces { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Batch> Batches { get; set; }
+        public virtual KeyType KeyType { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<EAuth> EAuths { get; set; }
     }
 }

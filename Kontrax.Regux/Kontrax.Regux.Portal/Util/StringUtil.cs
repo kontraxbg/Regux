@@ -1,22 +1,25 @@
 ﻿using System;
 
-public static class StringUtil
+namespace Kontrax.Regux.Portal
 {
-    public static string FirstCapitalLetter(this string s)
+    public static class StringUtil
     {
-        if (s == null)
+        public static string FirstCapitalLetter(this string s)
         {
-            return null;
+            if (s == null)
+            {
+                return null;
+            }
+            return s.Substring(0, 1).ToUpper() + s.Substring(1);
         }
-        return s.Substring(0, 1).ToUpper() + s.Substring(1);
-    }
 
-    public static string NewLineToBr(this string s)
-    {
-        if (s == null)
+        public static string NewLineToBr(this string s)
         {
-            return null;
+            if (s == null)
+            {
+                return null;
+            }
+            return s.Replace(Environment.NewLine, "<br />");
         }
-        return s.Replace(Environment.NewLine, "<br />");
     }
 }

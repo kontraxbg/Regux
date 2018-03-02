@@ -1,31 +1,294 @@
-﻿@{
-    ViewBag.Title = "Home Page";
+﻿@using Kontrax.Regux.Model.Report
+@model IncompleteBatchesViewModel
+
+@{
+    ViewBag.Title = string.Empty;
+    string cancelledBatchId = Request.QueryString["cancelledBatchId"];
+    int batchIndex = 0;
+    bool canApproveRegistrations = Model.CurrentUser.CanAddEmployees;
+    bool canResolveSignals = Model.CurrentUser.CanAddEmployees;
 }
 
-<div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
-</div>
+@if (!string.IsNullOrEmpty(cancelledBatchId))
+{
+    <div class="alert alert-success">
+        Случаят е отказан успешно.
+        @Html.ActionLink("Може да го прегледате тук.", "Edit", "Batch", new { id = cancelledBatchId, resume = true }, null)
+    </div>
+}
 
-<div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
+@if (Model.UsersForApproval.Count > 0)
+{
+    <h2>Потребители, които очакват одобрение на профила си</h2>
+    <div class="panel panel-info">
+        <div class="panel-heading"></div>
+        <div class="panel-body">
+            <table class="table table-hover">
+                <tr>
+                    <th>@Html.DisplayNameFor(model => model.UsersForApproval[0].UserDisplayName)</th>
+                    <th>@Html.DisplayNameFor(model => model.UsersForApproval[0].Administration)</th>
+                    <th>@Html.DisplayNameFor(model => model.UsersForApproval[0].AccessLevel)</th>
+                    <th class="text-center">Одобрение</th>
+                    <th class="text-center">Отказ</th>
+                    <th class="text-center">Блокиране</th>
+                </tr>
+                @foreach (var user in Model.UsersForApproval)
+                {
+                    <tr>
+                        <td>
+                            @Html.ActionLink(user.UserDisplayName, "Edit", "UserManagement", new { id = user.UserId }, htmlAttributes: new { title = "Редактиране на потребител" })
+                        </td>
+                        <td>@Html.DisplayFor(_ => user.Administration)</td>
+                        <td>@Html.DisplayFor(_ => user.AccessLevel)</td>
+                        <!-- Бутон одобряване -->
+                        <td class="text-center">
+                            @using (Html.BeginForm("ApproveOrBlockUser", "Home", new { userId = user.UserId, approveUser = true, ban = false }))
+                            {
+                                @Html.AntiForgeryToken()
+                                <button class="btn btn-success btn-xs" type="submit" title="Одобрение" onclick="return confirm('Сигурни ли сте, че искате да одобрите потребителя?')">
+                                    <span class="glyphicon glyphicon-ok-sign"></span>
+                                </button>
+                            }
+                        </td>
+                        <!-- Бутон отказ -->
+                        <td class="text-center">
+                            @using (Html.BeginForm("ApproveOrBlockUser", "Home", new { userId = user.UserId, approveUser = false, ban = false }))
+                            {
+                                @Html.AntiForgeryToken()
+                                <button class="btn btn-warning btn-xs" type="submit" title="Отказ" onclick="return confirm('Сигурни ли сте, че искате да откажете потребителя?')">
+                                    <span class="glyphicon glyphicon-remove"></span>
+                                </button>
+                            }
+                        </td>
+                        <!-- Бутон блокиране -->
+                        <td class="text-center">
+                            @using (Html.BeginForm("ApproveOrBlockUser", "Home", new { userId = user.UserId, approveUser = false, ban = true }))
+                            {
+                                @Html.AntiForgeryToken()
+                                <button class="btn btn-danger btn-xs" type="submit" title="Блокиране" onclick="return confirm('Сигурни ли сте, че искате да блокирате потребителя?')">
+                                    <span class="glyphicon glyphicon-ban-circle"></span>
+                                </button>
+                            }
+                        </td>
+                    </tr>
+                }
+            </table>
+        </div>
     </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
+}
+else if (canApproveRegistrations)
+{
+    // Ако потребителят има право да одобрява заявления за регистриране се показва добрата вест, че няма неизпълнени задачи.
+    <div class="panel panel-success">
+        <div class="panel-heading"></div>
+        <div class="panel-body">Няма чакащи заявления за регистриране на потребител.</div>
     </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
+}
+
+@if (Model.IncompleteBatches != null && Model.IncompleteBatches.Count > 0)
+{
+    <h2>Незавършени случаи</h2>
+    <div class="panel panel-info">
+        <div class="panel-heading form-horizontal">
+            <div class="row">
+                <label class="col-md-1 control-label">Търсене:</label>
+                <div class="col-md-11">
+                    <input id="searchFilter" class="form-control" />
+                </div>
+            </div>
+        </div>
+        <div class="panel-body">
+            <table class="table table-hover">
+                <tr>
+                    <th title="Кога потребителят е започнал да въвежда параметрите">
+                        @Html.DisplayNameFor(model => model.IncompleteBatches.First().CreateDateTime)
+                        @*<span class="glyphicon glyphicon-info-sign"></span>*@
+                    </th>
+                    <th>@Html.DisplayNameFor(model => model.IncompleteBatches.First().Activity)</th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.IncompleteBatches.First().Steps.First().Dependency)<br />
+                        <small><i>(@Html.DisplayNameFor(model => model.IncompleteBatches.First().Steps.First().Dependency.RegiXReport.RegisterName))</i></small>
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.IncompleteBatches.First().ServiceUri)<br />
+                        @Html.DisplayNameFor(model => model.IncompleteBatches.First().Steps.First().PersonOrCompanyId)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.IncompleteBatches.First().UserDisplayName)<br />
+                        @Html.DisplayNameFor(model => model.IncompleteBatches.First().Steps.First().StatusText)
+                    </th>
+                    <th></th>
+                </tr>
+                @foreach (var batch in Model.IncompleteBatches)
+                {
+                    batchIndex++;
+                    int stepsCanBeCancelled = batch.Steps.Count(s => !s.IsDone && !s.IsCanceled);
+                    bool hasDoneSteps = batch.Steps.Any(s => s.IsDone);
+
+                    // id-то на реда е необходимо единствено за позициониране на конкретния ред чрез hash в url-то.
+                    // Отказването на единична стъпка (не не целия случай) прави redirect към адрес от вида https://.../Regux/#123
+                    <tr id="@Html.DisplayFor(_ => batch.Id)" class="batch" data-batch="@batchIndex">
+                        <td>@Html.DisplayFor(_ => batch.CreateDateTime)</td>
+                        <td colspan="2">
+                            <a href="@Url.Action("Edit", "Batch", new { id = batch.Id, resume = true })">
+                                @Html.DisplayFor(_ => batch.Activity.Title)
+                            </a>
+                        </td>
+                        <td>@Html.DisplayFor(_ => batch.ServiceUri)</td>
+                        <td>@Html.DisplayFor(_ => batch.UserDisplayName)</td>
+                        <td>
+                            @* Главният бутон за отказ на всички стъпки не се показва ако някоя стъпка вече е получила отговор(или грешка), а друга - не,
+                                защото потребителят се заблуждава, че стъпката с отговора също ще бъде отказана. *@
+                            @if (!hasDoneSteps)
+                            {
+                                using (Html.BeginForm("CancelBatch", null, new { batchId = batch.Id }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    string cancelHint = stepsCanBeCancelled >= 2 ? "Отказване на всички удостоверения" : "Отказване на удостоверението";
+                                    <button class="btn btn-danger btn-xs" type="submit" title="@cancelHint" onclick="return confirm('Сигурни ли сте, че искате да откажете случая?')">
+                                        <span class="glyphicon glyphicon-remove"></span>
+                                    </button>
+                                }
+                            }
+                        </td>
+                    </tr>
+                    foreach (var request in batch.Steps)
+                    {
+                        <tr class="filtered-row @(request.MatchesFilter ? null : "text-warning")" data-batch="@batchIndex">
+                            <td>
+                                @if (request.StartDateTime.HasValue)
+                                {
+                                    @Html.DisplayFor(_ => request.StartDateTime)
+                                }
+                                else
+                                {
+                                    @Html.DisplayFor(_ => request.EndDateTime)
+                                }
+                            </td>
+                            <td>
+                                @* Търсенето и филтрирането работи само върху тези редове, но не и върху batch редовете.
+                                    Информацията от batch редовете се копира и тук, но скрита, за да може да се търси по нея. *@
+                                <div style="display: none">
+                                    @Html.DisplayFor(_ => batch.Activity.Title)
+                                    @Html.DisplayFor(_ => batch.ServiceUri)
+                                </div>
+                            </td>
+                            <td>
+                                @Html.DisplayFor(_ => request.Dependency)
+                            </td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(request.PersonOrCompanyId))
+                                {
+                                    @Html.DisplayFor(_ => request.PersonOrCompanyIdType)
+                                    @(" ")
+                                    @Html.DisplayFor(_ => request.PersonOrCompanyId)
+                                }
+                            </td>
+                            <td class="@request.CssClass">@Html.DisplayFor(_ => request.StatusText)</td>
+                            <td>
+                                @* Малките бутони за отказване на конкретна стъпка се показват само ако има смисъл,
+                                    т.е. ако има няколко стъпки за отказване или ако главният бутон е скрит. *@
+                                @if (!request.IsDone && !request.IsCanceled && (stepsCanBeCancelled >= 2 || hasDoneSteps))
+                                {
+                                    using (Html.BeginForm("CancelRequest", null, new { batchId = batch.Id, regiXReportId = request.Dependency.RegiXReport.Id }))
+                                    {
+                                        @Html.AntiForgeryToken()
+                                        <button class="btn-link" type="submit" title="Отказване на заявката" onclick="return confirm('Сигурни ли сте, че искате да откажете само това удостоверение?')">
+                                            <span class="text-danger glyphicon glyphicon-remove"></span>
+                                        </button>
+                                    }
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+            </table>
+        </div>
     </div>
-</div>
+}
+else
+{
+    <div class="panel panel-success">
+        <div class="panel-heading"></div>
+        <div class="panel-body">Няма незавършени случаи. Изберете @Html.ActionLink("Удостоверения", "Index", "Select"), за да заявите ново удостоверение чрез RegiX.</div>
+    </div>
+}
+
+@if (Model.PublicSignalsForReview.Signals.Count > 0)
+{
+    <h2>Сигнали, които очакват разглеждане</h2>
+    <div class="panel panel-info">
+        <div class="panel-heading"></div>
+        <div class="panel-body">
+            @*@Html.AjaxGrid(Url.Action("SignalsPartial", new { param = "value" }))*@
+            <table class="table table-hover">
+                <tr>
+                    <th>@Html.DisplayNameFor(_ => Model.PublicSignalsForReview.Signals.First().IsProposal)</th>
+                    <th>@Html.DisplayNameFor(_ => Model.PublicSignalsForReview.Signals.First().SenderNote)</th>
+                    <th>@Html.DisplayNameFor(_ => Model.PublicSignalsForReview.Signals.First().ServiceName)</th>
+                    <th>@Html.DisplayNameFor(_ => Model.PublicSignalsForReview.Signals.First().IncidentDateTime)</th>
+                    <th>@Html.DisplayNameFor(_ => Model.PublicSignalsForReview.Signals.First().SubmitDateTime)</th>
+                    <th class="col-md-1 text-center"></th>
+                </tr>
+                @foreach (var signal in Model.PublicSignalsForReview.Signals)
+                {
+                    <tr>
+                        <td>@(signal.IsProposal ? "Предложение" : "Сигнал")</td>
+                        <td>@Html.DisplayFor(_ => signal.SenderNote)</td>
+                        <td>@Html.DisplayFor(_ => signal.ServiceName)</td>
+                        <td>@Html.DisplayFor(_ => signal.IncidentDateTime)</td>
+                        <td>@Html.DisplayFor(_ => signal.SubmitDateTime)</td>
+                        <td class="text-center">
+                            <a class="btn btn-info btn-xs" title="Разглеждане" href="@Url.Action("Edit", "Signal", new { id = signal.Id })">
+                                Разглеждане
+                                @*<span class="glyphicon glyphicon-eye-open"></span>*@
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </table>
+        </div>
+    </div>
+}
+else if (canResolveSignals)
+{
+    // Ако потребителят има право да разглежда сигнали се показва добрата вест, че няма неизпълнени задачи.
+    <div class="panel panel-success">
+        <div class="panel-heading"></div>
+        <div class="panel-body">Няма неразгледани сигнали.</div>
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/Scripts/MvcGrid/mvc-grid.js");
+    <script>
+        var rows = $("tr.filtered-row");
+        var batches = $("tr.batch");
+
+        $(function () {
+            $('.mvc-grid').mvcgrid();
+        });
+
+        $("#searchFilter").keyup(function () {
+            var data = this.value;
+            app.delay(function () {
+                if (this.value != "") {
+                    batches.hide();
+                    rows.hide();
+                    rows.filter(function (i, v) {
+                        return $(this).is(":Contains('" + data + "')");
+                    }).show();
+                    // Показват се само случаите с поне едно видимо удостоверение.
+                    batches.filter(function (i, v) {
+                        var batchIndex = $(this).data("batch");
+                        return $("tr.filtered-row[data-batch=" + batchIndex + "]:visible").length > 0;
+                    }).show();
+                }
+                else {
+                    batches.show();
+                    rows.show();
+                }
+            }, 500);
+        });
+    </script>
+}

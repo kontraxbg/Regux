@@ -18,7 +18,17 @@
 
         public override string ToString()
         {
-            return $"Елемент {Name ?? QName} {_multiplicity} тип {_type.Name ?? _type.SimpleTypeCode ?? _type.QName}, {Description ?? "без описание"}";
+            string typeText;
+            if (_type != null)
+            {
+                string typeTitle = _type.Name ?? _type.SimpleTypeCode ?? _type.QName;
+                typeText = typeTitle != null ? "тип " + typeTitle : "inline тип";
+            }
+            else
+            {
+                typeText = "неизвестен тип";
+            }
+            return $"Елемент {Name ?? QName} {_multiplicity} {typeText}, {Description ?? "без описание"}";
         }
     }
 }

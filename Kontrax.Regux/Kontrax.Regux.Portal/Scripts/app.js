@@ -1,5 +1,37 @@
 ﻿var app = (function () {
-    var basesUrl = $('#applicationBaseUrl').attr('href');
+    // Не позволява на IE да кешира резултата от ajax get заявките.
+    // https://stackoverflow.com/questions/1013637/unexpected-caching-of-ajax-results-in-ie8
+    $.ajaxSetup({
+        cache: false
+    });
+
+    var baseUrl = $('#applicationBaseUrl').attr('href');
+    var mvcRouteTemplate = $('#mvcRouteTemplate').attr('href');
+    var apiRouteTemplate = $('#apiRouteTemplate').attr('href');
+
+    // Ползват се аналогично на @Url.Action(), но не поддържат routeValues.
+    var mvcActionUrl = function (action, controller) {
+        return mvcRouteTemplate.replace('_action_', action).replace('_controller_', controller);
+    };
+    var apiActionUrl = function (action, controller) {
+        return apiRouteTemplate.replace('_action_', action).replace('_controller_', controller);
+    };
+
+    // See https://stackoverflow.com/questions/1909441/how-to-delay-the-keyup-handler-until-the-user-stops-typing
+    var delay = (function () {
+        var timer = 0;
+        return function (callback, ms) {
+            clearTimeout(timer);
+            timer = setTimeout(callback, ms);
+        };
+    })();
+
+    // See https://stackoverflow.com/questions/17353350/use-input-to-filter-table-rows
+    $.expr[":"].Contains = jQuery.expr.createPseudo(function (arg) {
+        return function (elem) {
+            return jQuery(elem).text().toUpperCase().indexOf(arg.toUpperCase()) >= 0;
+        };
+    });
 
     var pleaseWaitDiv = $('<div class="modal fade" tabindex="-1" role="dialog"  aria-hidden="true" id="pleaseWaitDialog" data-backdrop="static" data-keyboard="false"> \
                                         <div class="modal-dialog"> \
@@ -90,10 +122,10 @@
     var showDeleteModal = function (url) {
         // TODO: Make it to load only 1 time!!!
         var urlPartsLength = url.split('/').length;
-        if (urlPartsLength == 4) {
+        if (urlPartsLength === 4) {
             url = url.substr(url.indexOf('/') + 1, url.length);
         }
-        $.get(basesUrl + 'templates/deleteModal.html', function (data) {
+        $.get(baseUrl + 'templates/deleteModal.html', function (data) {
             $('body').append(data);
             $('#deleteConfirmed').data('url', url);
             $('#deleteModal').modal('show');
@@ -101,15 +133,15 @@
     };
 
     var multplyFloats = function (a, b) {
-        if (typeof a == "string") {
+        if (typeof a === "string") {
             a = a.replace(/ /g, '');
         }
-        if (typeof b == "string") {
+        if (typeof b === "string") {
             b = b.replace(/ /g, '');
         }
         var atens = Math.pow(10, String(a).length - String(a).indexOf('.') - 1),
             btens = Math.pow(10, String(b).length - String(b).indexOf('.') - 1);
-        var result = (a * atens) * (b * btens) / (atens * btens);
+        var result = a * atens * b * btens / (atens * btens);
         if (isNaN(result)) {
             return '';
         }
@@ -198,7 +230,7 @@
         }).on('select2:unselecting', function (e) {
             $(this).trigger('change');
         });
-    }
+    };
 
     var initLastSelect2Dynamic = function () {
         $('select.select2Dynamic').last().select2({
@@ -207,7 +239,7 @@
             'allowClear': true
         }).on('select2:unselecting', function (e) {
             $(this).trigger('change');
-        });;
+        });
     };
 
     var initSelect2Dynamic = function (element) {
@@ -241,7 +273,7 @@
         var s = num + "";
         while (s.length < size) s = "0" + s;
         return s;
-    }
+    };
 
     var isNumericRange = function (range) {
         var isNumeric = false;
@@ -282,7 +314,7 @@
         var rangeParts = lastRange.split('-');
 
         $.ajax({
-            url: app.baseUrl + 'api/ExternalRequest/GetLetterRange/' + rangeParts[0],
+            url: app.apiActionUrl('GetLetterRange', 'ExternalRequest') + '/' + rangeParts[0],
             contentType: 'text/plain',
             async: false
         }).done(function (data) {
@@ -297,12 +329,14 @@
 
     var isInt = function (value) {
         return !isNaN(value) &&
-            parseInt(Number(value)) == value &&
+            parseInt(Number(value)) === value &&
             !isNaN(parseInt(value, 10));
     };
 
     return {
-        baseUrl: basesUrl,
+        mvcActionUrl: mvcActionUrl,
+        apiActionUrl: apiActionUrl,
+        delay: delay,
         showPleaseWait: showPleaseWait,
         hidePleaseWait: hidePleaseWait,
         initTooltip: initTooltip,
@@ -325,10 +359,10 @@
         showSimpleModal: showSimpleModal,
         removeSpaceSeparator: removeSpaceSeparator,
         initLastSelect2: initLastSelect2,
+        pad: pad,
         isNumericRange: isNumericRange,
         generateNumericRange: generateNumericRange,
         generateLetterRange: generateLetterRange,
-        isInt: isInt,
-        pad: pad
-    }
+        isInt: isInt
+    };
 })();

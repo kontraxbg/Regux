@@ -1,13 +1,19 @@
-﻿body {
+﻿html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
     padding-top: 50px;
-    padding-bottom: 20px;
+    padding-bottom: 0;
+    margin-bottom: 60px; /* Margin bottom by footer height */
 }
 
 /* Set padding to keep content from hitting the edges */
-.body-content {
+/*.body-content {
     padding-left: 15px;
     padding-right: 15px;
-}
+}*/
 
 /* Override the default bootstrap behavior where horizontal description lists 
    will truncate terms that are too long to fit in the left column 
@@ -23,3 +29,223 @@ textarea {
     max-width: 100%;
     /*max-width: 280px;*/
 }
+
+.fileUpload {
+    position: relative;
+    overflow: hidden;
+}
+
+.fileUpload input.upload {
+        position: absolute;
+        top: 0;
+        right: 0;
+        margin: 0;
+        padding: 0;
+        font-size: 20px;
+        cursor: pointer;
+        opacity: 0;
+        filter: alpha(opacity=0);
+}
+
+/*.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 60px; 
+    line-height: 60px;
+    background-color: #f5f5f5;
+}*/
+
+/*.footer-bottom {
+    background: #E3E3E3;
+    border-top: 1px solid #DDDDDD;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}*/
+
+    .footer-bottom p.pull-left {
+        padding-top: 6px;
+    }
+
+.gerb {
+    background: url("../Content/Images/gerb.png") no-repeat center bottom;
+    height: 100px;
+}
+
+.site-title {
+    padding-left: 0;
+    margin-bottom: 30px;
+    font-family: 'Ubuntu Condensed';
+    background: -moz-linear-gradient(left, rgba(243,243,243,1) 0%, rgba(243,243,243,1) 64%, rgba(243,243,243,0) 100%);
+    background: -webkit-linear-gradient(left, rgba(243,243,243,1) 0%,rgba(243,243,243,1) 64%,rgba(243,243,243,0) 100%);
+    background: -o-linear-gradient(left, rgba(243,243,243,1) 0%,rgba(243,243,243,1) 64%,rgba(243,243,243,0) 100%);
+    background: -ms-linear-gradient(left, rgba(243,243,243,1) 0%,rgba(243,243,243,1) 64%,rgba(243,243,243,0) 100%);
+}
+
+    .site-title h3 {
+        margin: 0;
+        letter-spacing: 2px
+    }
+
+    .site-title h2 {
+        margin: 0;
+        font-size: 40px;
+        color: #6D0000;
+    }
+
+
+.homeItem {
+    margin-bottom: 30px;
+    padding-left: 15px;
+    padding-right: 15px;
+    /*border: 1px solid #f0f0f3;*/
+}
+
+    .homeItem a {
+        text-decoration: none;
+    }
+
+    .homeItem h3 {
+        padding: 20px;
+    }
+
+    .homeItem p {
+        padding: 0 20px 0 20px;
+    }
+
+.vertical-align {
+    display: flex;
+    align-items: center;
+}
+
+.homeItem > div {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.input-group-addon.primary {
+    color: rgb(255, 255, 255);
+    background-color: rgb(50, 118, 177);
+    border-color: rgb(40, 94, 142);
+}
+
+.input-group-addon.success {
+    color: rgb(255, 255, 255);
+    background-color: rgb(92, 184, 92);
+    border-color: rgb(76, 174, 76);
+}
+
+.input-group-addon.info {
+    color: rgb(255, 255, 255);
+    background-color: rgb(57, 179, 215);
+    border-color: rgb(38, 154, 188);
+}
+
+.input-group-addon.warning {
+    color: rgb(255, 255, 255);
+    background-color: rgb(240, 173, 78);
+    border-color: rgb(238, 162, 54);
+}
+
+.input-group-addon.danger {
+    color: rgb(255, 255, 255);
+    background-color: rgb(217, 83, 79);
+    border-color: rgb(212, 63, 58);
+}
+
+.form-group.required .control-label:after {
+    content: "*";
+    color: red;
+}
+
+
+/* Нов лейаут за сайта */
+
+/* Кремав фон с бели странични полета и жълт border, подобен на http://regixaisweb.egov.bg/RegiXInfo. */
+.body-content {
+    background-color: #f2f0e6;
+    margin-left: 15px;
+    margin-right: 15px;
+    border: 1px solid #ffe8c9;
+}
+
+/* Главното меню на bootstrap със зелен фон, с горно заобляне и бял текст, по подобие на http://regixaisweb.egov.bg/RegiXInfo. */
+.top-menu {
+    background-color: #8c9637;
+    margin: 0 15px;
+    border-top: 1px solid #619f4a;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+}
+
+.navbar-nav > li > a, .navbar-header > a {
+    color: white;
+    text-shadow: none;
+    font-weight: bold;
+}
+
+/* Светло-зелен вместо светло-сив фон при hover въру главното меню на bootstrap. */
+.nav > li > a:hover,
+.nav > li > a:focus,
+.nav .open > a,
+.nav .open > a:hover,
+.nav .open > a:focus {
+    text-decoration: none;
+    background-color: #618f4a;
+    border-radius: 6px;
+}
+
+/* Footer със стил, подобен на http://regixaisweb.egov.bg/RegiXInfo. */
+.footer-bottom {
+    background-color: #564e48;
+    border-top: 7px solid #8c9637;
+    color: #c1aea2;
+    font-weight: bold;
+    margin-left: 15px;
+    margin-right: 15px;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    text-align: center;
+}
+
+/* По-зелени вместо по-сини link-ове, за да се доближат малко до топлата гама на сайта. */
+a {
+    color: #009090;
+}
+
+/* Малко по-обли bootstrap панели, за да станат подобни на http://regixaisweb.egov.bg/RegiXInfo. */
+.panel {
+    border-radius: 6px;
+}
+
+.panel-heading {
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+}
+
+/* Синият информационният bootstrap панел е подменен с кафяв, с удебелен светъл текст и оранжев border по подобие на http://regixaisweb.egov.bg/RegiXInfo. */
+.panel-info {
+    border-color: #ffe0c9;
+}
+
+    .panel-info > .panel-heading {
+        background-image: linear-gradient(to bottom, #8c6862 0%, #775e5e 100%);
+        background-color: #775e5e;
+        color: #f3f3f3;
+        border-color: #ffe0c9;
+        font-weight: bold;
+    }
+        /* Link-овете в информационния bootstrap панел също са светли, защото вместо син той вече е кафяв. */
+        .panel-info > .panel-heading a {
+            color: #f3f3f3;
+        }
+
+/* Кафяв фон със светъл текст (не bootstrap панел), по подобие на http://regixaisweb.egov.bg/RegiXInfo. */
+.brown-title {
+    background-color: #775e5e;
+    padding: 6px 20px;
+    border-radius: 4px;
+    color: #f3f3f3;
+    font-weight: bold;
+}
+

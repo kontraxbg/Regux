@@ -20,7 +20,7 @@ namespace Kontrax.Regux.Service
             _userId = userId;
         }
 
-        public async Task<UserPermissionsModel> GetPermissions()
+        public async Task<UserPermissionsModel> GetPermissionsAsync()
         {
             AspNetUser user = await (
                 from u in _db.AspNetUsers.Include(u => u.AspNetRoles)
@@ -29,30 +29,48 @@ namespace Kontrax.Regux.Service
             ).FirstOrDefaultAsync();
             MustExist(user, "потребител", _userId);
 
-            UserLocalRole[] localRoles = await (
-                from r in _db.UserLocalRoles
-                where r.UserId == _userId
+            UserPermissionsModel model = new UserPermissionsModel(_userId, user.PersonName ?? user.UserName, user.IsGlobalAdmin);
+
+            var workplaces = await (
+                from w in _db.Workplaces
+                where w.UserId == _userId
                 // TODO: Проверка за валиден потребител.
-                orderby r.AdministrationId
-                select r
+                orderby w.Administration.Name
+                select new
+                {
+                    w.AdministrationId,
+                    AdministrationName = (w.Administration.IsClosed ? "закрита: " : string.Empty) + w.Administration.Name,
+
+                    // RegiX справките, които се ползват за поне една дейност на администрацията, се водят "разрешени за администрацията".
+                    AdministrationRegiXReportIds = (
+                        from a in w.Administration.Activities
+                        from d in a.Dependencies
+                        select d.RegiXReportId
+                    ).Distinct(),
+
+                    w.AccessLevelCode,
+                    AccessLevelName = w.AccessLevel.Name,
+
+                    w.LocalRoleId,
+                    LocalRoleName = w.LocalRole.Name ?? LocalRoleName.None,
+
+                    LocalRoleRegiXReportIds =
+                        from r in w.LocalRole.RegiXReports
+                        select r.Id
+                }
             ).ToArrayAsync();
 
-            return new UserPermissionsModel
+            foreach (var w in workplaces)
             {
-                UserId = _userId,
-                DisplayName = user.PersonName ?? user.UserName,
-                IsGlobalAdmin = user.IsGlobalAdmin,
-                ManagerOfAdministrationIds = (
-                    from r in localRoles
-                    where r.LocalRoleCode == Model.LocalRole.Admin || r.LocalRoleCode == Model.LocalRole.Manager
-                    select r.AdministrationId
-                ).ToArray(),
-                AdminOfAdministrationIds = (
-                    from r in localRoles
-                    where r.LocalRoleCode == Model.LocalRole.Admin
-                    select r.AdministrationId
-                ).ToArray()
-            };
+                model.AddWorkplace(new WorkplaceModel(
+                    w.AdministrationId, w.AdministrationName,
+                    w.AdministrationRegiXReportIds,
+                    w.AccessLevelCode, w.AccessLevelName,
+                    w.LocalRoleId, w.LocalRoleName,
+                    w.LocalRoleRegiXReportIds));
+            }
+
+            return model;
         }
     }
 }

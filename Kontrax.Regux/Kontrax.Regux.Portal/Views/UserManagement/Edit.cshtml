@@ -1,83 +1,163 @@
-﻿@model Kontrax.Regux.Model.UserManagement.UserEditModel
+﻿@using System.Linq.Expressions
+@model Kontrax.Regux.Model.UserManagement.UserEditModel
 
 @{
     ViewBag.Title = "Редактиране на служител";
+    // Ако избраният потребител вече работи във всички администрации, за които текущият потребител има права,
+    // то списъкът за избор на ново работно място е празен и няма смисъл да се показва.
+    bool canAddWorkplace = Model.NewWorkplace.Administrations.Any();
 }
 
 @section Subtitle {
     @Html.ActionLink("Назад към списъка със служители", "Index")
 }
 
+@helper EditorOrDisplayFor(Expression<Func<Kontrax.Regux.Model.UserManagement.UserEditModel, string>> expression)
+{
+    if (Model.CurrentUserCanEditThisUser)
+    {
+        @Html.EditorFor(expression, new { htmlAttributes = new { @class = "form-control" } })
+        @Html.ValidationMessageFor(expression, null, new { @class = "text-danger" })
+    }
+    else
+    {
+        @Html.HiddenFor(expression)
+        <div class="form-control">@Html.DisplayFor(expression)</div>
+    }
+}
+
+@helper SecureCheckBoxFor(Expression<Func<Kontrax.Regux.Model.UserManagement.UserEditModel, bool>> expression)
+{
+    if (Model.CurrentUserCanEditThisUser)
+    {
+        @Html.EditorFor(expression, new { htmlAttributes = new { @class = "form-control" } })
+        @Html.ValidationMessageFor(expression, null, new { @class = "text-danger" })
+    }
+    else
+    {
+        @Html.HiddenFor(expression)
+        @Html.CheckBoxFor(expression, new { @class = "form-control", disabled = "disabled" })
+    }
+}
+
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
-    @Html.ValidationSummary(true)
+    @Html.ValidationSummary(true, null, new { @class = "text-danger" })
     <div class="panel panel-info">
         <div class="panel-heading"></div>
         <div class="panel-body">
             <div class="form-horizontal">
                 <div class="form-group">
-                    @Html.LabelFor(model => model.UserName, new { @class = "control-label col-md-2" })
-                    <div class="col-md-4">
-                        @Html.EditorFor(model => model.UserName, new { htmlAttributes = new { @class = "form-control" } })
-                        @Html.ValidationMessageFor(model => model.UserName)
+                    <label class="control-label col-md-2" title="Това име се въвежда на страницата за вход, въпреки че там полето е озаглавено &quot;E-mail&quot;.
+Не е задължително потребителското име да съвпада с e-mail адреса, но е препоръчително.">
+                        <span class="glyphicon glyphicon-info-sign text-info"></span>
+                        @Html.DisplayNameFor(model => model.UserName)
+                    </label>
+                    <div class="col-md-3">
+                        @EditorOrDisplayFor(model => model.UserName)
                     </div>
                     @Html.LabelFor(model => model.PersonName, new { @class = "control-label col-md-2" })
-                    <div class="col-md-4">
-                        @Html.EditorFor(model => model.PersonName, new { htmlAttributes = new { @class = "form-control" } })
-                        @Html.ValidationMessageFor(model => model.PersonName)
+                    <div class="col-md-3">
+                        @EditorOrDisplayFor(model => model.PersonName)
+                    </div>
+                    @Html.LabelFor(model => model.IsBanned, new { @class = "control-label col-md-1" })
+                    <div class="col-md-1">
+                        @SecureCheckBoxFor(model => model.IsBanned)
                     </div>
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(model => model.Email, new { @class = "control-label col-md-2" })
-                    <div class="col-md-4">
-                        @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control" } })
-                        @Html.ValidationMessageFor(model => model.Email)
+                    <div class="col-md-3">
+                        @EditorOrDisplayFor(model => model.Email)
                     </div>
                     @Html.LabelFor(model => model.PhoneNumber, new { @class = "control-label col-md-2" })
-                    <div class="col-md-4">
-                        @Html.EditorFor(model => model.PhoneNumber, new { htmlAttributes = new { @class = "form-control" } })
-                        @Html.ValidationMessageFor(model => model.PhoneNumber)
+                    <div class="col-md-3">
+                        @EditorOrDisplayFor(model => model.PhoneNumber)
                     </div>
                 </div>
                 <div class="form-group">
-                    @Html.LabelFor(model => model.NewPassword, new { @class = "control-label col-md-2" })
-                    <div class="col-md-4">
-                        @Html.EditorFor(model => model.NewPassword, new { htmlAttributes = new { @class = "form-control" } })
-                        @Html.ValidationMessageFor(model => model.NewPassword)
-                    </div>
-                    @Html.LabelFor(model => model.IsGlobalAdmin, new { @class = "control-label col-md-5" })
+                    @Html.LabelFor(model => model.IsEAuthEnabled, new { @class = "control-label col-md-4" })
                     <div class="col-md-1">
+                        @SecureCheckBoxFor(model => model.IsEAuthEnabled)
+                    </div>
+                    @Html.LabelFor(model => model.PersonIdentifier, new { @class = "control-label col-md-2" })
+                    <div class="col-md-1">
+                        @if (Model.CurrentUserCanEditThisUser)
+                        {
+                            @Html.DropDownListFor(model => model.PidTypeCode, new SelectList(Model.PidTypes, "Code", "Name"), "---", new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.PidTypeCode, null, new { @class = "text-danger" })
+                        }
+                        else
+                        {
+                            @Html.HiddenFor(model => model.PidTypeCode)
+                            @Html.DropDownListFor(model => model.PidTypeCode, new SelectList(Model.PidTypes, "Code", "Name"), "---", new { @class = "form-control", disabled = "disabled" })
+                        }
+                    </div>
+                    <div class="col-md-2">
+                        @EditorOrDisplayFor(model => model.PersonIdentifier)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.IsGlobalAdmin, new { @class = "control-label col-md-4" })
+                    <div class="col-md-1">
+                        @* Условието за този check box е друго, затова не се ползва helper-ът.
+                        @SecureCheckBoxFor(model => model.IsGlobalAdmin)*@
                         @if (Model.CurrentUser.IsGlobalAdmin)
                         {
                             @Html.EditorFor(model => model.IsGlobalAdmin, new { htmlAttributes = new { @class = "form-control" } })
-                            @Html.ValidationMessageFor(model => model.IsGlobalAdmin)
+                            @Html.ValidationMessageFor(model => model.IsGlobalAdmin, null, new { @class = "text-danger" })
                         }
                         else
                         {
                             @Html.HiddenFor(model => model.IsGlobalAdmin)
-                            @Html.EditorFor(model => model.IsGlobalAdmin, new { htmlAttributes = new { @class = "form-control", disabled = "disabled" } })
+                            @Html.CheckBoxFor(model => model.IsGlobalAdmin, new { @class = "form-control", disabled = "disabled" })
                         }
                     </div>
+                    @if (Model.CurrentUserCanEditThisUser && !string.IsNullOrEmpty(Model.Email))
+                    {
+                        <div class="col-md-4 col-md-offset-1">
+                            <input class="col-md-12 btn btn-default" type="submit" name="SendResetPasswordEmailAction" value="@Html.DisplayNameFor(model => model.SendResetPasswordEmailAction)" />
+                        </div>
+                    }
                 </div>
             </div>
         </div>
         <div class="panel-heading"></div>
         <div class="panel-body">
             <div class="form-horizontal">
-                @for (int i = 0; i < Model.UserLocalRoles.Count; i++)
+                @if (Model.Workplaces.Length > 0)
                 {
-                    @Html.EditorFor(model => model.UserLocalRoles[i])
+                    <div class="row">
+                        @Html.LabelFor(model => model.Workplaces[0].AdministrationId, new { @class = "col-md-6" })
+                        @Html.LabelFor(model => model.Workplaces[0].AccessLevelCode, new { @class = "col-md-3" })
+                        @Html.LabelFor(model => model.Workplaces[0].LocalRoleId, new { @class = "col-md-3" })
+                    </div>
+                    for (int i = 0; i < Model.Workplaces.Length; i++)
+                    {
+                        @Html.EditorFor(model => model.Workplaces[i])
+                    }
                 }
-                @* Ако избраният потребител вече работи във всички администрации, за които текущият потребител има права,
-                    то списъкът за избор е празен и няма смисъл да се показва. *@
-                @if (Model.NewLocalRole.Administrations.Any())
+                else
                 {
-                    @Html.EditorFor(model => model.NewLocalRole)
+                    @(canAddWorkplace ? "Изберете администрация и ниво на достъп." : "Не е избрано работно място.")
+                }
+                @if (canAddWorkplace)
+                {
+                    <div class="form-group">
+                        <div class="col-md-6">
+                            @Html.DropDownListFor(model => model.NewWorkplace.AdministrationId, new SelectList(Model.NewWorkplace.Administrations, "Id", "Name"), "---", new { @class = "form-control select2-search-select" })
+                            @Html.ValidationMessageFor(model => model.NewWorkplace.AdministrationId)
+                        </div>
+                        <div class="col-md-3">
+                            @Html.DropDownListFor(model => model.NewWorkplace.AccessLevelCode, new SelectList(Model.NewWorkplace.AccessLevels, "Code", "Name"), "---", new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.NewWorkplace.AccessLevelCode)
+                        </div>
+                    </div>
                 }
                 <div class="row">
                     <div class="col-md-3">
-                        <button type="submit" class="btn btn-primary col-md-12">Запис</button>
+                        <input class="btn btn-primary col-md-12" type="submit" name="SaveAction" value="@Html.DisplayNameFor(model => model.SaveAction)" />
                     </div>
                 </div>
             </div>
@@ -85,48 +165,43 @@
     </div>
 }
 
-@using (Html.BeginForm("IssueCertificate", null, FormMethod.Post))
-{
-    @Html.AntiForgeryToken()
-    @Html.ValidationSummary(true)
-
-    <input type="hidden" value="@Model.Id" name="userId" />
-    <div class="panel panel-info">
-        <div class="panel-heading clearfix">
-            <div class="panel-title pull-left">
-                Данни за потребителски сертификат
-            </div>
-            @if (Model.Certificate != null)
-            {
+<div class="panel panel-default">
+    <div class="panel-heading clearfix">
+        Потребителски сертификат за вход в системата, издаден от администрацията
+        @if (Model.Certificate != null && !Model.Certificate.IsEmpty)
+        {
             <div class="pull-right">
-                <a href="@Url.Action("DownloadCertificateAsync", new { id = Model.Id })" class="btn btn-default"><span class="glyphicon glyphicon-certificate"></span> Изтегли</a>
+                <a href="@Url.Action("DownloadCertificate", new { id = Model.Id })" class="btn btn-default"><span class="glyphicon glyphicon-download"></span> Изтегляне</a>
             </div>
-            }
-        </div>
-        <div class="panel-body">
-            <div class="form-horizontal">
-                @Html.DisplayFor(model => model.Certificate)
-                <hr/>
-                <div class="form-group row">
-                    @Html.LabelFor(model => model.UserLocalRoles.First().AdministrationId, new { @class = "control-label col-md-2" })
-                    <div class="col-md-10">
-                        @Html.DropDownList("AdministrationID", new SelectList(Model.UserLocalRoles, "AdministrationID", "AdministrationName"), "--изберете--", new { @class = "form-control col-md-10" })
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-3">
-                        <button type="submit" class="btn btn-info col-md-12" onclick="return confirm('Сигурни ли сте, че искате да издадете нов сертификат за този потребител?')">Издай</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+        }
     </div>
-}
+    <div class="panel-body">
+        @Html.DisplayFor(model => model.Certificate)
+        <hr />
+        @using (Html.BeginForm("IssueCertificate", null, new { id = Model.Id }, FormMethod.Post, new { @class = "form-horizontal" }))
+        {
+            <div class="form-group">
+                @Html.LabelFor(model => model.Workplaces[0].AdministrationId, new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true)
 
-@using (Html.BeginForm("Delete", null, new { userId = Model.Id }))
+                    <div class="input-group">
+                        @Html.DropDownList("AdministrationId", new SelectList(Model.Workplaces, "AdministrationId", "AdministrationName"), new { @class = "form-control col-md-10" })
+                        <div class="input-group-btn">
+                            <button type="submit" class="col-md-12 btn btn-primary" onclick="return confirm('Сигурни ли сте, че искате да издадете нов сертификат за този потребител?')"><span class="glyphicon glyphicon-certificate"></span> Издаване</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@using (Html.BeginForm("Delete", null, new { id = Model.Id }))
 {
     @Html.AntiForgeryToken()
-    @Html.ValidationSummary(true)
+    @Html.ValidationSummary(true, null, new { @class = "text-danger" })
     <div class="panel panel-info">
         <div class="panel-heading">Изтриване на погрешно създаден потребител, който още не е работил</div>
         <div class="panel-body">

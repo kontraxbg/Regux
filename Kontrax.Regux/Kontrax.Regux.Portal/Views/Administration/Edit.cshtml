@@ -1,87 +1,82 @@
 ﻿@model Kontrax.Regux.Model.Administration.AdministrationEditModel
 
 @{
-    ViewBag.Title = "Редактиране на администрация";
+    ViewBag.Title = "Редактиране на " + Model.Name;
 }
 
 @section Subtitle {
-    @Html.ActionLink("Назад към списъка с администрации", "Index")
+    @Html.ActionLink(Model.IsPublicServiceProvider ? "Назад към данните на доставчика на обществени услуги" : "Назад към данните на администрацията", "Details", new { id = Model.Id })
 }
 
 @using (Html.BeginForm(null, null, FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
-
-    <div class="panel panel-info">
+    @Html.ValidationSummary(true, null, new { @class = "text-danger" })
+    <div class="panel panel-info form-horizontal">
         <div class="panel-heading"></div>
         <div class="panel-body">
-            <div class="form-horizontal">
-                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-                @Html.HiddenFor(model => model.Id)
-
-                <div class="form-group">
-                    @Html.LabelFor(model => model.Code, htmlAttributes: new { @class = "control-label col-md-2" })
-                    <div class="col-md-10">
-                        @Html.EditorFor(model => model.Code, new { htmlAttributes = new { @class = "form-control" } })
-                        @Html.ValidationMessageFor(model => model.Code, "", new { @class = "text-danger" })
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    @Html.LabelFor(model => model.ParentId, htmlAttributes: new { @class = "control-label col-md-2" })
-                    <div class="col-md-10">
-                        @Html.DropDownListFor(model => model.ParentId, new SelectList(Model.Administrations, "Id", "Name"), "няма", new { @class = "form-control" })
-                        @Html.ValidationMessageFor(model => model.ParentId, "", new { @class = "text-danger" })
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
-                    <div class="col-md-10">
-                        @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
-                        @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    @Html.LabelFor(model => model.ProposedCertificate, htmlAttributes: new { @class = "control-label col-md-2" })
-                    <div class="col-md-10">
-                        <div class="input-group">
-                            <input type="text" placeholder="Изберете файл..." disabled class="form-control filePlaceholder" />
-                            <div class="input-group-btn">
-                                <div class="fileUpload btn btn-primary btn-small">
-                                    <span class="glyphicon glyphicon-folder-open"></span>
-                                    <input type="file" class="upload" name="proposedCertificateFile" />
-                                </div>
-                            </div>
-                        </div>
-                        <file-upload name="files"></file-upload>
-                        <span asp-validation-for="ProposedCertificate" class="text-danger"></span>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    @Html.LabelFor(model => model.ProposedCertificatePassword, htmlAttributes: new { @class = "control-label col-md-2" })
-                    <div class="col-md-10">
-                        @Html.EditorFor(model => model.ProposedCertificatePassword, new { htmlAttributes = new { @class = "form-control" } })
-                        @Html.ValidationMessageFor(model => model.ProposedCertificatePassword, "", new { @class = "text-danger" })
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="col-md-offset-2 col-md-10">
-                        <div class="row">
-                            <div class="col-md-3">
-                                <button type="submit" class="btn btn-primary col-md-12">Запис</button>
-                            </div>
-                        </div>
-                    </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Name, null, new { @class = "text-danger" })
                 </div>
             </div>
-
+            <div class="form-group">
+                @* Само администрациите имат видове. *@
+                @if (!Model.IsPublicServiceProvider)
+                {
+                    @Html.LabelFor(model => model.KindCode, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-4">
+                        @Html.DropDownListFor(model => model.KindCode, new SelectList(Model.Kinds, "Code", "Name"), "(неуточнен)", new { @class = "form-control select2-search-select" })
+                        @Html.ValidationMessageFor(model => model.KindCode, null, new { @class = "text-danger" })
+                    </div>
+                }
+                else
+                {
+                    <div class="col-md-6"></div>
+                }
+                @Html.LabelFor(model => model.Uic, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-4">
+                    @Html.EditorFor(model => model.Uic, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Uic, null, new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.IsClosed, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-4">
+                    @Html.EditorFor(model => model.IsClosed, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.IsClosed, null, new { @class = "text-danger" })
+                </div>
+                @Html.LabelFor(model => model.Oid, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-4">
+                    @Html.EditorFor(model => model.Oid, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Oid, null, new { @class = "text-danger" })
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary col-md-2">Запис</button>
         </div>
     </div>
 }
+
+<div class="panel panel-info">
+    @if (Model.IsPublicServiceProvider)
+    {
+        <div class="panel-heading">Изтриване на погрешно създаден доставчик на обществени услуги, който още не е използван</div>
+    }
+    else
+    {
+        <div class="panel-heading">Изтриване на погрешно създадена администрация, която още не е използвана</div>
+    }
+    <div class="panel-body">
+        @using (Html.BeginForm("Delete", null, new { id = Model.Id, psp = Model.IsPublicServiceProvider }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, null, new { @class = "text-danger" })
+            <button type="submit" class="btn btn-danger col-md-2" onclick="return confirm('Сигурни ли сте, че искате да изтриете @(Model.IsPublicServiceProvider ? "доставчика на обществени услуги" : "администрациията")?')">Изтриване</button>
+        }
+    </div>
+</div>
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")

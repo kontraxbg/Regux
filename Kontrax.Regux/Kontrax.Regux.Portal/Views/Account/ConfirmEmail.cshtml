@@ -1,9 +1,53 @@
-﻿@{
-    ViewBag.Title = "Confirm Email";
+﻿@model Kontrax.Regux.Model.Account.EmailConfirmedModel
+
+@{
+    ViewBag.Title = string.Empty;
 }
 
-<div>
-    <p>
-        Thank you for confirming your email. Please @Html.ActionLink("Click here to Log in", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })
-    </p>
-</div>
+@section Subtitle {
+    @Html.Partial("_MinistryCouncilHeaderPartial")
+}
+
+@if (Model.IsSuccessful)
+{
+    <div class="h2 row">
+        <div class="col-md-offset-2 col-md-10">E-mail адресът е потвърден</div>
+    </div>
+    <div class="row h4">
+        <div class="col-md-offset-2 col-md-10">
+            <div class="text-success">Проверката на e-mail адреса @Html.DisplayFor(model => model.Email) приключи успешно.</div><br />
+            @if (!Model.IsApproved.HasValue)
+            {
+                @("След като заявлението за регистриране бъде одобрено от администратор,")<br />
+                @Html.ActionLink("щракнете тук, за да влезете в системата.", "Login", null, new { userName = Model.UserName }, null)
+            }
+            else if (Model.IsApproved == true)
+            {
+                @("Заявлението за регистриране вече е одобрено от администратор.")<br />
+                @Html.ActionLink("Щракнете тук, за да влезете в системата.", "Login", null, new { userName = Model.UserName }, null)
+            }
+            else
+            {
+                @("Заявлението за регистриране е отказано от администратор.")<br />
+                @("След като уточнете причините може да подадете ново заявление.")
+            }
+        </div>
+    </div>
+}
+else
+{
+    <div class="h2 row">
+        <div class="col-md-offset-2 col-md-10">E-mail адресът не може да бъде потвърден</div>
+    </div>
+    <div class="row h4">
+        <div class="col-md-offset-2 col-md-10">
+            Времето за потвърждение е изтекло или сте използвали връзка от по-старо писмо.<br />
+            Уверете се, че използвате последния получен e-mail или подайте ново заявление.
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-offset-2 col-md-10 help-block">
+            <i>(може да затворите тази страница)</i>
+        </div>
+    </div>
+}

@@ -1,30 +1,27 @@
 ﻿using BotDetect.Web.Mvc;
 using Kontrax.Regux.Data;
 using Kontrax.Regux.Public.Portal.Models;
+using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using System.Web.Mvc;
 
 namespace Kontrax.Regux.Public.Portal.Controllers.Complaint
 {
-    // Засега, докато реализираме вход за потребители
-    [AllowAnonymous]
-    public class ComplaintController : Controller
+    [Authorize]
+    public class ComplaintController : BaseController
     {
-        protected readonly ReguxEntities _context = new ReguxEntities();
-
-        public ComplaintController()
-        {
-        }
-
         public ActionResult Create()
         {
-            ComplaintModel model = new ComplaintModel();
+            DateTime now = DateTime.Now;
+            ComplaintModel model = new ComplaintModel
+            {
+                SubmitDateTime = now,
+                IncidentDateTime = now
+            };
             LoadListsForModel(model);
-
             return View(model);
         }
 
@@ -32,6 +29,8 @@ namespace Kontrax.Regux.Public.Portal.Controllers.Complaint
         [CaptchaValidation("CaptchaCode", "ExampleCaptcha", "Неверен CAPTCHA код!")]
         public async Task<ActionResult> Create(ComplaintModel model)
         {
+            var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+
             if (!ModelState.IsValid)
             {
                 // TODO: Captcha validation failed, show error message      
@@ -43,35 +42,32 @@ namespace Kontrax.Regux.Public.Portal.Controllers.Complaint
             {
                 // TODO: Captcha validation passed, proceed with protected action  
                 MvcCaptcha.ResetCaptcha("ExampleCaptcha");
-                //model.ServiceName = _context.Services.Find(model.ServiceId).Name;
-                //model.AdministrationName = _context.Administrations.Find(model.AdministrationId).Name;
-                model.EmployeeName = _context.AspNetUsers.Find(model.EmployeeId).PersonName;
-                model.SubmitDateTime = DateTime.Now;
-                model.IncidentDateTime = model.IncidentDateTime;
+                if (model.EmployeeId != null)
+                {
+                    model.EmployeeName = _context.AspNetUsers.Where(x => x.Id == model.EmployeeId).FirstOrDefault()?.PersonName;
+                }
             }
 
             try
             {
-                Signal signal = new Signal();
-                signal.SubmitDateTime = model.SubmitDateTime;
-                signal.IncidentDateTime = model.IncidentDateTime;
-                signal.ServiceId = model.ServiceId;
-                signal.AdministrationId = model.AdministrationId;
-                signal.EmployeeId = model.EmployeeId;
-                signal.EmployeeName = model.EmployeeName;
-                signal.SenderNote = model.SenderNote;
-
-                if (!model.IsAnonymous)
+                Signal signal = new Signal
                 {
-                    signal.SenderPidTypeCode = model.SenderPidTypeCode;
-                    signal.SenderIdentifier = model.SenderIdentifier;
-                    signal.SenderContact = model.SenderContact;
-                }
+                    SenderId = user.Id,
+                    SubmitDateTime = DateTime.Now,
+                    IncidentDateTime = model.IncidentDateTime,
+                    ServiceId = model.ServiceId,
+                    AdministrationId = model.AdministrationId,
+                    EmployeeId = model.EmployeeId,
+                    EmployeeName = model.EmployeeName,
+                    SenderNote = model.SenderNote,
+                    SenderContact = model.SenderContact,
+                    IsProposal = false
+                };
 
                 _context.Signals.Add(signal);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesWithValidationExplainedAsync();
 
-                return RedirectToAction("Details", "Complaint");
+                return RedirectToAction(nameof(Details), "Complaint");
             }
             catch (Exception ex)
             {
@@ -82,42 +78,42 @@ namespace Kontrax.Regux.Public.Portal.Controllers.Complaint
 
         public ActionResult Details()
         {
-            var results = _context.Signals.OrderByDescending(x => x.SubmitDateTime).ToList();
+            string userId = User.Identity.GetUserId();
 
-            List<ComplaintViewModel> model = new List<ComplaintViewModel>();
-            foreach (var item in results)
-            {
-                model.Add(new ComplaintViewModel()
-                {
-                    Id = item.Id,
-                    AdministrationName = item.Administration.Name,
-                    EmployeeName = item.EmployeeName,
-                    IncidentDateTime = item.IncidentDateTime,
-                    SubmitDateTime = item.SubmitDateTime,
-                    SenderContact = item.SenderContact,
-                    SenderIdentifier = item.SenderIdentifier,
-                    SenderNote = item.SenderNote,
-                    SenderPidTypeCode = item.SenderPidTypeCode,
-                    ServiceName = item.Service.Name
-                });
-            }
+            List<SignalViewModel> model = (
+                from s in _context.Signals
+                orderby s.SubmitDateTime descending
+                where s.SenderId == userId
+                select s).ToList().Select(x => new SignalViewModel(x)).ToList();
 
             return View(model);
         }
 
+        public JsonResult GetServicesForAdministration(string id)
+        {
+            var result = (
+                from s in _context.Activities
+                where s.AdministrationId.ToString() == id
+                select new JsonTestModel()
+                {
+                    Id = s.ProvidedServiceId.ToString(),
+                    Name = s.Service.Name,
+                    IsSpecial = ((s.SearchAdmServiceMainData || s.SearchBatchesForAdmService) ? 0 : 1).ToString()
+                }).ToArray();
+
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
         private void LoadListsForModel(ComplaintModel model)
         {
-            model.Services = new IdNameSelectList(from x in _context.Services.ToList()
-                                                  select new IdNameModel(x.Id, x.Name));
+            //model.Services = new IdNameSelectList(from x in _context.Services.ToList()
+            //                                      select new IdNameModel(x.Id, x.Name));
 
             model.Administrations = new IdNameSelectList(from x in _context.Administrations.ToList()
                                                          select new IdNameModel(x.Id, x.Name));
 
-            model.Employees = new CodeNameSelectList(from x in _context.AspNetUsers.ToList()
-                                                     select new CodeNameModel(x.Id, x.PersonName));
-
-            model.PidTypes = new CodeNameSelectList(from x in _context.PidTypes.ToList()
-                                                    select new CodeNameModel(x.Code, x.Name));
+            //model.Employees = new CodeNameSelectList(from x in _context.AspNetUsers.ToList()
+            //                                         select new CodeNameModel(x.Id, x.PersonName));
         }
     }
 }

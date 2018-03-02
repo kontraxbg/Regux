@@ -4,36 +4,70 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="73d9406af4124000b08d72554d2dfda5" Name="MainDiagram">
-        <EntityTypeShape EntityType="ReguxModel.AspNetUser" Width="1.5" PointX="3" PointY="1.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="ReguxModel.Request" Width="1.5" PointX="5.125" PointY="4.25" />
-        <EntityTypeShape EntityType="ReguxModel.Response" Width="1.5" PointX="7.25" PointY="5" />
-        <EntityTypeShape EntityType="ReguxModel.ServiceStep" Width="1.5" PointX="5.125" PointY="8.75" />
-        <EntityTypeShape EntityType="ReguxModel.Config" Width="1.5" PointX="7.25" PointY="0.5" />
-        <EntityTypeShape EntityType="ReguxModel.PidType" Width="1.5" PointX="9.375" PointY="1.625" />
-        <EntityTypeShape EntityType="ReguxModel.Signal" Width="1.5" PointX="9.375" PointY="3.875" />
-        <AssociationConnector Association="ReguxModel.FK_Request_AspNetUsers" />
+      <Diagram DiagramId="73d9406af4124000b08d72554d2dfda5" Name="MainDiagram" ZoomLevel="63">
+        <EntityTypeShape EntityType="ReguxModel.AspNetUser" Width="1.5" PointX="9.875" PointY="3.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="ReguxModel.Config" Width="1.5" PointX="12" PointY="1.125" />
+        <EntityTypeShape EntityType="ReguxModel.Signal" Width="1.5" PointX="0.5" PointY="7.625" />
         <AssociationConnector Association="ReguxModel.FK_Signal_AspNetUsers" />
-        <AssociationConnector Association="ReguxModel.FK_Response_Request" />
-        <AssociationConnector Association="ReguxModel.FK_Signal_PidType" />
-        <EntityTypeShape EntityType="ReguxModel.Service" Width="1.5" PointX="2.75" PointY="7" />
-        <AssociationConnector Association="ReguxModel.FK_Request_Service" />
-        <AssociationConnector Association="ReguxModel.FK_ServiceStep_Child" />
-        <AssociationConnector Association="ReguxModel.FK_ServiceStep_Parent" />
+        <EntityTypeShape EntityType="ReguxModel.Service" Width="1.5" PointX="5.125" PointY="11.25" />
         <AssociationConnector Association="ReguxModel.FK_Signal_Service" />
-        <EntityTypeShape EntityType="ReguxModel.Administration" Width="1.5" PointX="0.5" PointY="5.875" />
-        <AssociationConnector Association="ReguxModel.FK_Administration_Parent" />
-        <AssociationConnector Association="ReguxModel.FK_Service_Administration" />
-        <EntityTypeShape EntityType="ReguxModel.UserLocalRole" Width="1.5" PointX="0.5" PointY="3.125" />
-        <EntityTypeShape EntityType="ReguxModel.LocalRole" Width="1.5" PointX="0.5" PointY="1" />
-        <AssociationConnector Association="ReguxModel.FK_UserLocalRole_Administration" />
-        <AssociationConnector Association="ReguxModel.FK_UserLocalRole_AspNetUsers" />
-        <AssociationConnector Association="ReguxModel.FK_UserLocalRole_LocalRole" />
-        <EntityTypeShape EntityType="ReguxModel.AspNetRole" Width="1.5" PointX="5.125" PointY="1.75" />
+        <EntityTypeShape EntityType="ReguxModel.Administration" Width="1.5" PointX="3.5" PointY="4.25" />
+        <EntityTypeShape EntityType="ReguxModel.AspNetRole" Width="1.5" PointX="9.875" PointY="1.125" />
         <AssociationConnector Association="ReguxModel.AspNetUserRoles" />
-        <EntityTypeShape EntityType="ReguxModel.Audit" Width="1.5" PointX="5.25" PointY="12.125" />
-        <AssociationConnector Association="ReguxModel.FK_Audit_AspNetUsers" />
         <AssociationConnector Association="ReguxModel.FK_Signal_Administration" />
+        <EntityTypeShape EntityType="ReguxModel.Audit" Width="1.5" PointX="12" PointY="3.125" />
+        <AssociationConnector Association="ReguxModel.FK_Audit_AspNetUsers" />
+        <AssociationConnector Association="ReguxModel.FK_Signal_Sender" />
+        <EntityTypeShape EntityType="ReguxModel.Workplace" Width="1.5" PointX="5.625" PointY="6.125" />
+        <EntityTypeShape EntityType="ReguxModel.AccessLevel" Width="1.5" PointX="7.875" PointY="5" />
+        <AssociationConnector Association="ReguxModel.FK_Workplace_Administration" />
+        <AssociationConnector Association="ReguxModel.FK_Workplace_AspNetUsers" />
+        <AssociationConnector Association="ReguxModel.FK_Workplace_AccessLevel" />
+        <EntityTypeShape EntityType="ReguxModel.LocalRole" Width="1.5" PointX="7.875" PointY="7" />
+        <AssociationConnector Association="ReguxModel.FK_LocalRole_Administration" />
+        <AssociationConnector Association="ReguxModel.FK_Workplace_LocalRole" />
+        <EntityTypeShape EntityType="ReguxModel.AdministrationKind" Width="1.5" PointX="5.625" PointY="4.125" />
+        <AssociationConnector Association="ReguxModel.FK_Administration_AdministrationKind" />
+        <EntityTypeShape EntityType="ReguxModel.ServiceSection" Width="1.5" PointX="7.25" PointY="13" />
+        <AssociationConnector Association="ReguxModel.FK_Service_ServiceSection" />
+        <EntityTypeShape EntityType="ReguxModel.Activity" Width="1.5" PointX="2.875" PointY="10.5" />
+        <AssociationConnector Association="ReguxModel.FK_Activity_Administration" />
+        <AssociationConnector Association="ReguxModel.FK_Activity_Service" />
+        <EntityTypeShape EntityType="ReguxModel.Dependency" Width="1.5" PointX="2.875" PointY="15.25" />
+        <EntityTypeShape EntityType="ReguxModel.PrintTemplate" Width="1.5" PointX="5.125" PointY="16.625" />
+        <AssociationConnector Association="ReguxModel.FK_Dependency_Activity" />
+        <AssociationConnector Association="ReguxModel.FK_PrintTemplate_Dependency" />
+        <EntityTypeShape EntityType="ReguxModel.RegiXReport" Width="1.5" PointX="7.875" PointY="15.125" />
+        <AssociationConnector Association="ReguxModel.FK_Dependency_RegiXReport" />
+        <AssociationConnector Association="ReguxModel.FK_PrintTemplate_RegiXReport" />
+        <AssociationConnector Association="ReguxModel.FK_Service_RegiXReport" />
+        <AssociationConnector Association="ReguxModel.LocalRoleRegiXReport" />
+        <EntityTypeShape EntityType="ReguxModel.Batch" Width="1.5" PointX="9.25" PointY="10.625" />
+        <AssociationConnector Association="ReguxModel.FK_Batch_Activity" />
+        <AssociationConnector Association="ReguxModel.FK_Batch_Administration" />
+        <AssociationConnector Association="ReguxModel.FK_Batch_AspNetUsers" />
+        <EntityTypeShape EntityType="ReguxModel.Response" Width="1.5" PointX="14.125" PointY="13.5" />
+        <EntityTypeShape EntityType="ReguxModel.RegiXReportKey" Width="1.5" PointX="10" PointY="17.375" />
+        <AssociationConnector Association="ReguxModel.FK_RegiXReportKey_RegiXReport" />
+        <EntityTypeShape EntityType="ReguxModel.Request" Width="1.5" PointX="12" PointY="12.875" />
+        <AssociationConnector Association="ReguxModel.FK_Audit_Request" />
+        <AssociationConnector Association="ReguxModel.FK_Request_Batch" />
+        <AssociationConnector Association="ReguxModel.FK_Request_RegiXReport" />
+        <AssociationConnector Association="ReguxModel.FK_Response_Request" />
+        <EntityTypeShape EntityType="ReguxModel.KeyType" Width="1.5" PointX="10" PointY="14.375" />
+        <AssociationConnector Association="ReguxModel.FK_AspNetUsers_KeyType" />
+        <AssociationConnector Association="ReguxModel.FK_RegiXReportKey_KeyType" />
+        <EntityTypeShape EntityType="ReguxModel.AuditType" Width="1.5" PointX="14.125" PointY="4.5" />
+        <AssociationConnector Association="ReguxModel.FK_Audit_AuditType" />
+        <EntityTypeShape EntityType="ReguxModel.EAuth" Width="1.5" PointX="14.125" PointY="8.75" />
+        <AssociationConnector Association="ReguxModel.FK_EAuth_AspNetUsers" />
+        <AssociationConnector Association="ReguxModel.FK_EAuth_KeyType" />
+        <EntityTypeShape EntityType="ReguxModel.AuditConfig" Width="1.5" PointX="14.125" PointY="6.5" />
+        <EntityTypeShape EntityType="ReguxModel.AuditDetail" Width="1.5" PointX="14.125" PointY="1" />
+        <AssociationConnector Association="ReguxModel.FK_AuditDetail_Audit" />
+        <EntityTypeShape EntityType="ReguxModel.AuditView" Width="1.5" PointX="16.375" PointY="1" />
+        <EntityTypeShape EntityType="ReguxModel.AdministrationCertificate" Width="1.5" PointX="3.5" PointY="1" />
+        <AssociationConnector Association="ReguxModel.FK_AdministrationCertificate_Administration" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

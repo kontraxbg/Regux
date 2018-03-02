@@ -1,28 +1,83 @@
-﻿@model Kontrax.Regux.Portal.Models.IndexViewModel
+﻿@model Kontrax.Regux.Model.Account.ManageViewModel
 @{
-    ViewBag.Title = "Manage";
+    ViewBag.Title = "Лични настройки";
 }
 
-@section Subtitle {
-    Change your account settings
-}
+<div class="panel panel-info">
+    <div class="panel-heading"></div>
+    <div class="panel-body">
+        <dl class="dl-horizontal">
+            <dt>@Html.DisplayNameFor(model => model.View.Email)</dt>
+            <dd>@Html.DisplayFor(model => model.View.Email)</dd>
 
-<p class="text-success">@Model.StatusMessage</p>
-<div>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>Password:</dt>
-        <dd>
-            [
-            @if (Model.HasPassword)
+            @if (Model.View.UserName != Model.View.Email)
             {
-                @Html.ActionLink("Change your password", "ChangePassword")
+                <dt>@Html.DisplayNameFor(model => model.View.UserName)</dt>
+                <dd>@Html.DisplayFor(model => model.View.UserName)</dd>
             }
-            else
+
+            @if (!string.IsNullOrEmpty(Model.View.PersonIdentifier))
             {
-                @Html.ActionLink("Create", "SetPassword")
+                <dt>@Html.DisplayFor(model => model.View.PidType)</dt>
+                <dd>@Html.DisplayFor(model => model.View.PersonIdentifier)</dd>
             }
-            ]
-        </dd>
-    </dl>
+
+            @if (Model.CurrentUser.IsGlobalAdmin)
+            {
+                <dt></dt>
+                <dd class="text-success">
+                    Вие сте @Kontrax.Regux.Model.Role.GlobalAdminName
+                </dd>
+            }
+
+            @foreach (var workplace in Model.CurrentUser.Workplaces)
+            {
+                <dt>Позиция</dt>
+                <dd>
+                    @Html.DisplayFor(_ => workplace.AccessLevelName) в
+                    @Html.DisplayFor(_ => workplace.AdministrationName)
+                    @if (workplace.LocalRoleId.HasValue)
+                    {
+                        @("- длъжност/роля ")
+                        @Html.DisplayFor(_ => workplace.LocalRoleName)
+                    }
+                </dd>
+            }
+        </dl>
+    </div>
+
+    <div class="panel-heading"></div>
+    <div class="panel-body form-horizontal">
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, null, new { @class = "text-danger" })
+            <div class="form-group">
+                @Html.LabelFor(model => model.PersonName, new { @class = "control-label col-md-2" })
+                <div class="col-md-5">
+                    @Html.EditorFor(model => model.PersonName, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.PersonName, null, new { @class = "text-danger" })
+                </div>
+                </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.PhoneNumber, new { @class = "control-label col-md-2" })
+                <div class="col-md-5">
+                    @Html.EditorFor(model => model.PhoneNumber, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.PhoneNumber, null, new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-2 col-md-offset-2">
+                    <input class="btn btn-primary col-md-12" type="submit" value="Запис" />
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="panel-heading"></div>
+    <div class="panel-body h4 row">
+        <div class="col-md-offset-2 col-md-10">
+            @Html.ActionLink("Промяна на паролата", "ChangePassword")
+        </div>
+    </div>
 </div>

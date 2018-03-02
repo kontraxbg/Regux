@@ -5,7 +5,7 @@
 }
 
 @section Subtitle {
-    @Html.ActionLink("Назад към списъка със служители", "Index")
+    @Html.ActionLink("Назад към списъка със служители", "Index", new { admId = Model.NewWorkplace.AdministrationId, level = Model.NewWorkplace.AccessLevelCode })
 }
 
 <div class="panel panel-info">
@@ -18,47 +18,38 @@
             <div class="form-horizontal">
                 <div class="form-group">
                     @Html.LabelFor(model => model.UserName, new { @class = "control-label col-md-2" })
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         @Html.EditorFor(model => model.UserName, new { htmlAttributes = new { @class = "form-control" } })
-                        @Html.ValidationMessageFor(model => model.UserName)
+                        @Html.ValidationMessageFor(model => model.UserName, null, new { @class = "text-danger" })
                     </div>
                     @Html.LabelFor(model => model.PersonName, new { @class = "control-label col-md-2" })
-                    <div class="col-md-4">
-                        @Html.EditorFor(model => model.PersonName, new { htmlAttributes = new { @class = "form-control" } })
-                        @Html.ValidationMessageFor(model => model.PersonName)
-                    </div>
-                </div>
-                <div class="form-group">
-                    @Html.LabelFor(model => model.Email, new { @class = "control-label col-md-2" })
-                    <div class="col-md-4">
-                        @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control" } })
-                        @Html.ValidationMessageFor(model => model.Email)
-                    </div>
-                    @Html.LabelFor(model => model.PhoneNumber, new { @class = "control-label col-md-2" })
-                    <div class="col-md-4">
-                        @Html.EditorFor(model => model.PhoneNumber, new { htmlAttributes = new { @class = "form-control" } })
-                        @Html.ValidationMessageFor(model => model.PhoneNumber)
-                    </div>
-                </div>
-                <div class="form-group">
-                    @Html.LabelFor(model => model.NewPassword, new { @class = "control-label col-md-2" })
-                    <div class="col-md-4">
-                        @Html.EditorFor(model => model.NewPassword, new { htmlAttributes = new { @class = "form-control" } })
-                        @Html.ValidationMessageFor(model => model.NewPassword)
-                    </div>
-                    @if (Model.CurrentUser.IsGlobalAdmin)
-                    {
-                        @Html.LabelFor(model => model.IsGlobalAdmin, new { @class = "control-label col-md-5" })
-                        <div class="col-md-1">
-                            @Html.EditorFor(model => model.IsGlobalAdmin, new { htmlAttributes = new { @class = "form-control" } })
-                            @Html.ValidationMessageFor(model => model.IsGlobalAdmin)
-                        </div>
-                    }
-                </div>
-                @Html.EditorFor(model => model.NewLocalRole)
-                <div class="row">
                     <div class="col-md-3">
-                        <button type="submit" class="btn btn-primary col-md-12">Запис</button>
+                        @Html.EditorFor(model => model.PersonName, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.PersonName, null, new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.NewWorkplace.AdministrationId, new { @class = "control-label col-md-2" })
+                    <div class="col-md-8">
+                        @Html.DropDownListFor(model => model.NewWorkplace.AdministrationId, new SelectList(Model.NewWorkplace.Administrations, "Id", "Name"), "---", new { @class = "form-control select2-search-select" })
+                        @Html.ValidationMessageFor(model => model.NewWorkplace.AdministrationId)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.NewWorkplace.AccessLevelCode, new { @class = "control-label col-md-2" })
+                    <div class="col-md-3">
+                        @Html.DropDownListFor(model => model.NewWorkplace.AccessLevelCode, new SelectList(Model.NewWorkplace.AccessLevels, "Code", "Name"), "---", new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.NewWorkplace.AccessLevelCode)
+                    </div>
+                    @Html.LabelFor(model => model.SendSetPasswordEmail, new { @class = "control-label col-md-4" })
+                    <div class="col-md-1">
+                        @Html.EditorFor(model => model.SendSetPasswordEmail, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.SendSetPasswordEmail, null, new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3 col-md-offset-2">
+                        <button type="submit" class="btn btn-primary col-md-12">Добавяне</button>
                     </div>
                 </div>
             </div>

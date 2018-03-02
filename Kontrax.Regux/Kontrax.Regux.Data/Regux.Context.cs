@@ -26,17 +26,31 @@ namespace Kontrax.Regux.Data
         }
     
         public virtual DbSet<AspNetUser> AspNetUsers { get; set; }
-        public virtual DbSet<Request> Requests { get; set; }
-        public virtual DbSet<Response> Responses { get; set; }
-        public virtual DbSet<ServiceStep> ServiceSteps { get; set; }
         public virtual DbSet<Config> Configs { get; set; }
-        public virtual DbSet<PidType> PidTypes { get; set; }
         public virtual DbSet<Signal> Signals { get; set; }
         public virtual DbSet<Service> Services { get; set; }
         public virtual DbSet<Administration> Administrations { get; set; }
-        public virtual DbSet<UserLocalRole> UserLocalRoles { get; set; }
-        public virtual DbSet<LocalRole> LocalRoles { get; set; }
         public virtual DbSet<AspNetRole> AspNetRoles { get; set; }
         public virtual DbSet<Audit> Audits { get; set; }
+        public virtual DbSet<Workplace> Workplaces { get; set; }
+        public virtual DbSet<AccessLevel> AccessLevels { get; set; }
+        public virtual DbSet<LocalRole> LocalRoles { get; set; }
+        public virtual DbSet<AdministrationKind> AdministrationKinds { get; set; }
+        public virtual DbSet<ServiceSection> ServiceSections { get; set; }
+        public virtual DbSet<Activity> Activities { get; set; }
+        public virtual DbSet<Dependency> Dependencies { get; set; }
+        public virtual DbSet<PrintTemplate> PrintTemplates { get; set; }
+        public virtual DbSet<RegiXReport> RegiXReports { get; set; }
+        public virtual DbSet<Batch> Batches { get; set; }
+        public virtual DbSet<Response> Responses { get; set; }
+        public virtual DbSet<RegiXReportKey> RegiXReportKeys { get; set; }
+        public virtual DbSet<Request> Requests { get; set; }
+        public virtual DbSet<KeyType> KeyTypes { get; set; }
+        public virtual DbSet<AuditType> AuditTypes { get; set; }
+        public virtual DbSet<EAuth> EAuths { get; set; }
+        public virtual DbSet<AuditConfig> AuditConfigs { get; set; }
+        public virtual DbSet<AuditDetail> AuditDetails { get; set; }
+        public virtual DbSet<AuditView> AuditViews { get; set; }
+        public virtual DbSet<AdministrationCertificate> AdministrationCertificates { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Kontrax.Regux.Data;
+using Kontrax.Regux.Model.Audit;
 
 namespace Kontrax.Regux.Service
 {
@@ -13,16 +14,40 @@ namespace Kontrax.Regux.Service
             _db.Dispose();
         }
 
-        public Task SaveAsync()
+        /// <summary>
+        /// Опростен вариант за master entity-та с числово id. Спестява досадното писане на typeof(Entity) и id.ToString().
+        /// </summary>
+        public Task SaveAndLogAsync(AuditModel audit, object logMasterEntity, int logMasterEntityId)
         {
-            // TODO: Централно логване на промените.
-            return _db.SaveChangesAsync();
+            if (logMasterEntity == null)
+            {
+                throw new ArgumentNullException(nameof(logMasterEntity));
+            }
+            return SaveAndLogAsync(audit, logMasterEntity.GetType(), logMasterEntityId.ToString());
         }
 
-        public void Save()
+        /// <summary>
+        /// Използва се само при създаване на новo master entity.
+        /// </summary>
+        protected Task SaveAndLogAsync(AuditModel audit, object logNewMasterEntity)
         {
-            // TODO: Централно логване на промените.
-            _db.SaveChanges();
+            if (logNewMasterEntity == null)
+            {
+                throw new ArgumentNullException(nameof(logNewMasterEntity));
+            }
+            // Вторият параметър е null, защото entity-то още няма id, НО след _db.SaveChangesAsync() id-то се появява и
+            // log.EntityRecordId се попълва автоматично с id-то на първия намерен обект от подадения тип.
+            return SaveAndLogAsync(audit, logNewMasterEntity.GetType(), null);
+        }
+
+        public Task SaveAndLogAsync(AuditModel audit, Type auditMasterEntityType, string auditMasterEntityId)
+        {
+            return ChangeLogger.SaveChangesAsync(_db, _db.SaveChangesWithValidationExplainedAsync, audit, auditMasterEntityType, auditMasterEntityId);
+        }
+
+        public int Log(AuditModel model)
+        {
+            return AuditHashUtil.Add(_db, model);
         }
 
         public static void MustExist(object o, string type, object id)

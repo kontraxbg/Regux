@@ -5,20 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     @{
         string title = ViewBag.Title;
-        string commonTitle = "RegUX";
+        string commonTitle = Kontrax.Regux.Model.ThisSystem.Name;
     }
     <title>
         @(!string.IsNullOrEmpty(title) ? string.Format("{0} - {1}", title, commonTitle) : commonTitle)
     </title>
-    @Styles.Render("~/Content/css")
+    @Styles.Render("~/Content/styles")
     @Scripts.Render("~/bundles/modernizr")
+    <link rel="stylesheet" href="~/Content/font-awesome.min.css">
     <link rel="home" id="applicationBaseUrl" href="@Url.Content("~/")" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="home" id="mvcRouteTemplate" href="@Url.Action("_action_", "_controller_")" />
+    <link rel="home" id="apiRouteTemplate" href="@Url.Action("_action_", "_controller_", new { httproute = string.Empty })" />
+    <link rel="icon" type="image/png" sizes="32x32" href="@Url.Content("~/favicon-32x32.png")">
+    <link rel="icon" type="image/png" sizes="96x96" href="@Url.Content("~/favicon-96x96.png")">
+    <link rel="icon" type="image/png" sizes="16x16" href="@Url.Content("~/favicon-16x16.png")">
 </head>
 <body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar navbar-fixed-top top-menu">
         <div class="container-fluid">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -26,7 +29,16 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a href="@Url.Action("Index", "Home")" class="navbar-brand"> <span class="glyphicon glyphicon-home"></span></a>
+                <a href="@Url.Action("Index", "Home")" class="navbar-brand">
+                    @if (Kontrax.Regux.Service.ConfigService.DevModeEnabled)
+                    {
+                        <span class="glyphicon glyphicon-home text-danger" title="DevMode: включени са допълнителни функции за тестови цели"></span>
+                    }
+                    else
+                    {
+                        <span class="glyphicon glyphicon-home"></span>
+                    }
+                </a>
             </div>
             <div class="navbar-collapse collapse">
                 @Html.Partial("_MenuPartial")
@@ -34,6 +46,13 @@
             </div>
         </div>
     </div>
+
+    @* Тази секция дава възможност съдържание от конкретното view да се показва най-горе (вместо главното меню) при скролиране на дълъг списък.
+        Когато div-ът е празен, скролирането не се прихваща. *@
+    <div class="overlay-header-placeholder container-fluid body-content">
+        @RenderSection("OverlayHeader", required: false)
+    </div>
+
     <div class="container-fluid body-content">
         <div class="hidden-print">
             @if (title != null)
@@ -46,31 +65,34 @@
                 <em>@title</em>
             }
             <h4>@RenderSection("Subtitle", required: false)</h4>
-            @Html.Action("AlertsPartial", "Home", new { area = string.Empty })
+            @Html.Partial("_AlertsPartial", Kontrax.Regux.Portal.Util.AlertUtil.GetAlerts(TempData))
         </div>
         @RenderBody()
         <hr />
-        <footer>
-            <div class="row">
-                <div class="col-md-4 col-md-offset-2">
-                    <img src="~/Content/Images/eu_esf.png" class="img-responsive" />
-                </div>
-                <div class="col-md-4 col-md-offset-1">
-                    <img src="~/Content/Images/logo-bg-right-no-back.png" class="img-responsive" />
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <div class="container-fluid">
-                    <p class="pull-left"> &copy; @DateTime.Now.Year - Трансформация на модела на административно обслужване </p>
-                </div>
-            </div>
-        </footer>
     </div>
+    <footer class="footer-bottom hidden-print">
+        <div class="row">
+            <div class="col-md-3 col-md-offset-1">
+                <img src="~/Content/Images/eu_esf.png" class="img-responsive" />
+            </div>
+            <div class="col-md-4"><br />Трансформация на модела на<br />административно обслужване </div>
+            <div class="col-md-3 col-md-offset-1">
+                <img src="~/Content/Images/logo-bg-right-no-back.png" class="img-responsive" />
+            </div>
+        </div>
+    </footer>
 
     @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/utils")
     @Scripts.Render("~/bundles/bootstrap")
-    <script src="~/Scripts/init.js"></script>
-    <script src="~/Scripts/app.js"></script>
-    @RenderSection("scripts", required: false)
+    @Scripts.Render("~/Scripts/init.js", "~/Scripts/app.js", "~/Scripts/overlay-header.js")
+
+    <script>
+        app.currentCulture = '@System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName';
+        app.ShortDateFormat = '@(System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern.Replace("'", string.Empty).Replace("d", "D").Replace("y", "Y").Replace("tt", "A"))'; //.Replace(" г.", "")
+        app.ShortTimeFormat = '@(System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.ShortTimePattern.Replace("'", string.Empty).Replace("d", "D").Replace("y", "Y").Replace("tt", "A"))';
+    </script>
+
+    @RenderSection("Scripts", required: false)
 </body>
 </html>

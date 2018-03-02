@@ -1,12 +1,109 @@
-﻿@{
+﻿@using Chart.Mvc.ComplexChart;
+@using Chart.Mvc.Extensions;
+
+@{
     ViewBag.Title = "Министерски съвет";
 }
-<div class="container body-content">
-    <div class="jumbotron text-center">
-        <h1>Министерски съвет</h1>
-        <p class="lead">Добре дошли в портала на Министерски съвет</p>
 
-        <button class="btn btn-default" type="button" onclick="location.href='@Url.Action("Create", "Complaint")'">Подайте сигнал</button>
-        <button class="btn btn-default" type="button" onclick="location.href='@Url.Action("Details", "Complaint")'">Подадени сигнали</button>
+<div class="site-title carousel">
+    <div class="gerb col-md-2 col-sm-3 hidden-xs carousel-inner"></div>
+    <div class="col-md-10 col-sm-9 carousel-inner text-center">
+        <h2>Министерски съвет</h2>
+        <h3>Трансформация на модела на административно обслужване</h3>
     </div>
 </div>
+@{
+    var barChart = new BarChart();
+    barChart.ComplexData.Labels.AddRange(new[] { "Час", "Ден", "Седмица", "Месец", "Година", "Общо" });
+    barChart.ComplexData.Datasets.AddRange(new List<ComplexDataset>
+    {
+        new ComplexDataset
+        {
+            Data = new List<double> { 5, 10, 15, 20, 25, 55  },
+            Label = "My First dataset",
+            FillColor = "rgba(40, 164, 201, 0.5)",
+            StrokeColor = "rgba(40, 164, 201, 1)",
+            PointColor = "rgba(40, 164, 201, 1)",
+            PointStrokeColor = "#fff",
+            PointHighlightFill = "#fff",
+            PointHighlightStroke = "rgba(151,187,205,1)",
+        },
+    });
+}
+@if (User.Identity.IsAuthenticated)
+{
+    <div class="container marketing h-100 justify-content-center align-items-center">
+        <div id="usageStats" class="row text-center ">
+            <a class="homeItem" id="hideCanvas" href="#">
+                <h4>Графика на използваните услуги</h4>
+            </a>
+            <div id="canvasPanel" class="collapse show" role="tabpanel">
+                <canvas id="myCanvas" height="30%" width="100%" class="col-lg-12 col-md-12 col-xs-12"></canvas>
+            </div>
+        </div>
+        <br />
+        <!-- Three columns of text below the carousel -->
+        <div class="row h-100 justify-content-center align-items-center">
+            <div class="col-lg-4 clearfix homeItem dl-horizontal">
+                <div class="img-rounded" style="color:#ded9d9; background-color:#e38d13;"><h3><i class="fa fa-exclamation-triangle"></i> Сигнал</h3></div>
+                <h3>Подайте сигнал при:</h3>
+                <div class="">
+                    <ul class="fa-ul">
+                        <li><i class="fa-li fa fa-check-square"></i>неправомерно изискване на удостоверения</li>
+                        <li>&nbsp;</li>
+                        <li>&nbsp;</li>
+                    </ul>
+                </div>
+                <br />
+                <p><a class="btn btn-lg btn-default" href="@Url.Action("Create", "Complaint")" role="button">Сигнал &raquo;</a></p>
+            </div>
+            <div class="col-lg-4 clearfix homeItem">
+                <div class="img-rounded" style="background-color:#28a4c9; color:#ded9d9;"><h3><i class="fa fa-comment"></i> Предложение</h3></div>
+                <h3>Подайте предложение за:</h3>
+                <div class="">
+                    <ul class="fa-ul">
+                        <li><i class="fa-li fa fa-check-square"></i>включване на нова услуга</li>
+                        <li>&nbsp;</li>
+                        <li>&nbsp;</li>
+                    </ul>
+                </div>
+                <br />
+                <p><a class="btn btn-lg btn-default" href="@Url.Action("Create", "ServiceProposal")" role="button">Предложение &raquo;</a></p>
+            </div>
+            <div class="col-lg-4 clearfix homeItem">
+                <div class="img-rounded" style="background-color:#ccc; color:#f9f9f9;"><h3><i class="fa fa-history"></i> История</h3></div>
+                <h3>Вижте история за:</h3>
+                <div class="">
+                    <ul class="fa-ul">
+                        <li><i class="fa-li fa fa-check-square"></i>статус</li>
+                        <li><i class="fa-li fa fa-check-square"></i>история на подадените сигнали и предложения</li>
+                    </ul>
+                </div>
+                <br />
+                <p><a class="btn btn-lg btn-default" href="@Url.Action("Details", "Complaint")" role="button">История &raquo;</a></p>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    Html.RenderAction("Login", "Account");
+}
+
+@section Scripts{
+    @Html.CreateChart("myCanvas", barChart)
+
+    <script>
+        $(document).ready(function () {
+            var canvas = $('#canvasPanel');
+            $('#hideCanvas').click(function () {
+                if (canvas.hasClass('show')) {
+                    canvas.removeClass('show');
+                }
+                else {
+                    canvas.addClass('show');
+                }
+            })
+        })
+    </script>
+}

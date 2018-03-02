@@ -17,29 +17,36 @@ namespace Kontrax.Regux.Data
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public Administration()
         {
-            this.Children = new HashSet<Administration>();
-            this.Services = new HashSet<Service>();
-            this.UserLocalRoles = new HashSet<UserLocalRole>();
             this.Signals = new HashSet<Signal>();
+            this.Workplaces = new HashSet<Workplace>();
+            this.LocalRoles = new HashSet<LocalRole>();
+            this.Activities = new HashSet<Activity>();
+            this.Batches = new HashSet<Batch>();
+            this.AdministrationCertificates = new HashSet<AdministrationCertificate>();
         }
     
         public int Id { get; set; }
-        public string Code { get; set; }
-        public Nullable<int> ParentId { get; set; }
         public string Name { get; set; }
-        public byte[] Certificate { get; set; }
-        public byte[] ProposedCertificate { get; set; }
-        public string CertificatePassword { get; set; }
-        public string ProposedCertificatePassword { get; set; }
+        public string Oid { get; set; }
+        public Nullable<long> Number { get; set; }
+        public Nullable<long> BatchId { get; set; }
+        public string Uic { get; set; }
+        public bool IsClosed { get; set; }
+        public string KindCode { get; set; }
+        public bool IsPublicServiceProvider { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Administration> Children { get; set; }
-        public virtual Administration Parent { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Service> Services { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<UserLocalRole> UserLocalRoles { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Signal> Signals { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Workplace> Workplaces { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<LocalRole> LocalRoles { get; set; }
+        public virtual AdministrationKind AdministrationKind { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Activity> Activities { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Batch> Batches { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<AdministrationCertificate> AdministrationCertificates { get; set; }
     }
 }

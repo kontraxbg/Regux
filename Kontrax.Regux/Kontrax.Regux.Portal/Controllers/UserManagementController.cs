@@ -1,164 +1,139 @@
 ﻿using System;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using Kontrax.Regux.Model;
+using Kontrax.Regux.Model.Administration;
+using Kontrax.Regux.Model.Audit;
+using Kontrax.Regux.Model.UserManagement;
+using Kontrax.Regux.Portal.Audit;
+using Kontrax.Regux.Portal.Identity;
+using Kontrax.Regux.Service;
+using Kontrax.Regux.Shared.Portal.Identity;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
-using Kontrax.Regux.Model.UserManagement;
-using Kontrax.Regux.Service;
-using Kontrax.Regux.Portal.Models;
-using Kontrax.Regux.Model;
-using System.Collections.Generic;
 
 namespace Kontrax.Regux.Portal.Controllers
 {
     public class UserManagementController : BaseController
     {
-        public string RoleCode { get; private set; }
-
         [HttpGet]
-        public async Task<ActionResult> Index()
+        public async Task<ActionResult> Index(int? admId, string filter, string level)
         {
             UsersViewModel model = new UsersViewModel
             {
-                CurrentUser = await User.GetPermissionsAsync()
+                AdministrationId = admId,
+                NameIdOrContact = filter,
+                UserTypeCode = level
             };
 
-            await LoadUsersAsync(model);
-            return await IndexViewAsync(model);
+            return await LoadUsersAsync(model);
         }
 
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<ActionResult> Index(UsersViewModel model)
         {
+            if (ModelState.IsValid)
+            {
+                return RedirectToAction(nameof(Index), new
+                {
+                    admId = model.AdministrationId,
+                    filter = model.NameIdOrContact,
+                    level = model.UserTypeCode
+                });
+            }
+
+            // Грешка в параметрите за търсене. Последните данни се презареждат.
+            return await LoadUsersAsync(model);
+        }
+
+        private async Task<ActionResult> LoadUsersAsync(UsersViewModel model)
+        {
             model.CurrentUser = await User.GetPermissionsAsync();
-
-            return await TryAsync(false,
-                () => LoadUsersAsync(model),
-                () => IndexViewAsync(model),
-                () => IndexViewAsync(model)
-            );
-        }
-
-        private static async Task LoadUsersAsync(UsersViewModel model)
-        {
             using (UserManagementService service = new UserManagementService())
             {
-                model.Users = await service.SearchUsersAsync(model.AdministrationId, model.LocalRoleCode);
-            }
-        }
-
-        private async Task<ActionResult> IndexViewAsync(UsersViewModel model)
-        {
-            using (AdministrationService service = new AdministrationService())
-            {
-                model.Administrations = await service.GetAdministrationsAsync(false);
-            }
-            // Въпреки че зареждането на данните и IndexViewAsync биха могли да споделят един UserManagementService,
-            // той не може да се dispose-ва с using или трябва да се ползва await TryAsync. Така е по-стабилно.
-            using (UserManagementService service = new UserManagementService())
-            {
-                model.LocalRoles = await service.GetLocalRolesAsync();
+                await service.SearchUsersAsync(model);
             }
             return View(model);
         }
 
         [HttpGet]
-        public async Task<ActionResult> Create()
+        public async Task<ActionResult> Create(int? admId, string level)
         {
-            UserCreateModel model = new UserCreateModel();
-            await PrepareModel(model);
-            return await CreateViewAsync(model);
-        }
-
-        [HttpPost, ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(UserCreateModel model)
-        {
-            await PrepareModel(model);
-
-            return await TryAsync(true,
-                async () =>
-                {
-                    using (UserManagementService service = new UserManagementService())
-                    {
-                        service.DemandPermission_AddEmployee(model.CurrentUser);
-
-                        ApplicationUser user = new ApplicationUser
-                        {
-                            UserName = model.UserName,
-                            PersonName = model.PersonName,
-                            Email = model.Email,
-                            PhoneNumber = model.PhoneNumber,
-                            // Паролата трябва да се смени при първи вход в системата
-                            ChangePassword = true
-                        };
-
-                        // Създаването на потребител с парола не може да стане в service layer-а, затова се ползва user manager-ът.
-                        using (ApplicationUserManager userManager = CreateUserManager())
-                        {
-                            DemandSuccess(await userManager.CreateAsync(user, model.NewPassword));
-                        }
-
-                        await service.SetGlobalAdminAsync(user.Id, model.IsGlobalAdmin, model.CurrentUser);
-
-                        if (model.NewLocalRole.AdministrationId.HasValue && !string.IsNullOrEmpty(model.NewLocalRole.LocalRoleCode))
-                        {
-                            await service.SetUserLocalRolesAsync(user.Id, model.NewLocalRole.ToEditModel(), model.CurrentUser);
-                        }
-                    }
-                },
-                () => RedirectToAction(nameof(Index)),
-                () => CreateViewAsync(model)
-            );
-        }
-
-        private async Task<ActionResult> CreateViewAsync(UserCreateModel model)
-        {
-            // Въпреки че записването и CreateViewAsync биха могли да споделят един UserManagementService,
-            // той не може да се dispose-ва с using или трябва да се ползва await TryAsync. Така е по-стабилно.
+            UserCreateModel model = new UserCreateModel { SendSetPasswordEmail = true };
+            model.NewWorkplace.AdministrationId = admId;
+            model.NewWorkplace.AccessLevelCode = level;
             using (UserManagementService service = new UserManagementService())
             {
-                CodeNameModel[] localRoles = await service.GetAssignableLocalRolesAsync(model.CurrentUser);
-
-                await NewLocalRole_SetViewData(model, localRoles);
+                await service.SetCreateModelViewDataAsync(model);
             }
             return View(model);
         }
 
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<ActionResult> IssueCertificate(string userId, int AdministrationID)
+        public async Task<ActionResult> Create(UserCreateModel model)
         {
-            if (ModelState.IsValid)
+            string userId = null;
+
+            using (UserManagementService service = new UserManagementService())
             {
-                using (var _administrationService = new AdministrationService())
-                {
-                    var administration = await _administrationService.GetAdministrationByIdAsync(AdministrationID);
-                    if (administration.Certificate != null)
+                return await TryAsync(
+                    async () =>
                     {
-                        var _certificateService = new CertificateService();
-                        var CACertificate = _certificateService.LoadCertificate(administration.Certificate, "password");
+                        UserPermissionsModel currentUser = await User.GetPermissionsAsync();
+                        if (!currentUser.CanAddEmployees)
+                        {
+                            throw new Exception($"Потребител {currentUser.DisplayName} няма право да добавя потребители.");
+                        }
+
+                        ApplicationUser user = new ApplicationUser
+                        {
+                            UserName = model.UserName,
+                            Email = model.UserName,
+                            PersonName = model.PersonName,
+                            // Потребителят е автоматично одобрен, тъй като се създава от администратор.
+                            IsApproved = true,
+                            // По подразбиране се изисква 2FA чрез еАвт.
+                            TwoFactorEnabled = true
+                        };
+
+                        // Изпращането на e-mail за избор на парола не може да стане в service layer-а, затова се ползва user manager-ът.
                         using (ApplicationUserManager userManager = CreateUserManager())
                         {
-                            var user = await userManager.FindByIdAsync(userId);
-                            string subjectName = $"CN={user.PersonName}";
-                            var userCertificate = _certificateService.IssueCertificate(subjectName, CACertificate, new[] { "server", "server.mydomain.com" });
-                            byte[] userCertificateData = _certificateService.WriteCertificate(userCertificate, "password");
-                            user.Certificate = userCertificateData;
-                            await userManager.UpdateAsync(user);
+                            DemandSuccess(await userManager.CreateAsync(user));
+                            userId = user.Id;
+
+                            WorkplaceCreateModel workplace = model.NewWorkplace;
+                            if (workplace.AdministrationId.HasValue && !string.IsNullOrEmpty(workplace.AccessLevelCode))
+                            {
+                                await service.SetUserWorkplacesAsync(userId, workplace.ToEditModel(), currentUser, GetAuditModel());
+                            }
+
+                            // На новия потребител се изпраща e-mail с link за потвърждение на адреса и първоначално задаване на парола.
+                            if (model.SendSetPasswordEmail)
+                            {
+                                // Името на администрацията и нивото на достъп се извличат по заобиколен начин - чрез попълване на UserViewModel.
+                                UserViewModel userModel = await service.GetUserAsync(userId);
+                                WorkplaceViewModel workplaceModel = userModel.Workplaces.First();
+
+                                string code = await userManager.GeneratePasswordResetTokenAsync(userId);
+                                string callbackUrl = Url.Action(nameof(AccountController.ResetPassword), "Account", new { userId, code }, protocol: Request.Url.Scheme);
+                                string body = $"Получихте достъп до {ThisSystem.Name} като {workplaceModel.AccessLevelName.ToLower()} на {workplaceModel.AdministrationName}." +
+                                    $"<br /><br />Моля щракнете <a href=\"{callbackUrl}\">тук</a>, за да докажете, че e-mail адресът {user.Email} е Ваш и да изберете парола за вход в системата.";
+                                await userManager.SendEmailAsync(userId, ApplicationUserManager.ConfirmEmailAddressSubject, body);
+                            }
                         }
-                        Success("Сертификат издаден успешно");
-                        return RedirectToAction("Edit", new { id = userId });
-                    }
-                    else
+                        _successMessage = "Потребителят е добавен успешно и следва да избере парола. При необходимост, тук може да направите допълнителни настройки.";
+                    },
+                    () => RedirectToAction(nameof(Edit), new { id = userId }),
+                    async () =>
                     {
-                        return RedirectToAction("Edit", new { id = userId });
+                        await service.SetCreateModelViewDataAsync(model);
+                        return View(model);
                     }
-                }
-            }
-            else
-            {
-                return RedirectToAction("Edit", new { id = userId });
+                );
             }
         }
 
@@ -169,116 +144,73 @@ namespace Kontrax.Regux.Portal.Controllers
             using (UserManagementService service = new UserManagementService())
             {
                 model = await service.GetUserForEditAsync(id);
+                model.CurrentUser = await User.GetPermissionsAsync();
+                return await EditViewAsync(model, service);
             }
-            await PrepareModel(model);
-            return await EditViewAsync(model);
-        }
-
-        public async Task<FileContentResult> DownloadCertificateAsync(string id)
-        {
-            UserEditModel model;
-            using (UserManagementService service = new UserManagementService())
-            {
-                model = await service.GetUserForEditAsync(id);
-            }
-            await PrepareModel(model);
-            return File(model.CertificateData, "application/x-pkcs12", $"{id}.pfx");
         }
 
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit(UserEditModel model)
         {
-            await PrepareModel(model);
-            if (model.UserLocalRoles == null)
+            UserPermissionsModel currentUser = await User.GetPermissionsAsync();
+            model.CurrentUser = currentUser;
+            if (model.Workplaces == null)
             {
-                model.UserLocalRoles = new List<UserLocalRoleEditModel>();
+                model.Workplaces = new WorkplaceEditModel[0];
             }
             string userId = model.Id;
 
-            return await TryAsync(true,
-                async () =>
+            using (UserManagementService service = new UserManagementService())
+            {
+                if (!string.IsNullOrEmpty(model.SendResetPasswordEmailAction))
                 {
-                    using (UserManagementService service = new UserManagementService())
-                    {
-                        await service.UpdateUserAsync(
-                            userId,
-                            model.UserName,
-                            model.PersonName,
-                            model.Email,
-                            model.PhoneNumber,
-                            model.IsGlobalAdmin,
-                            model.CurrentUser);
-
-                        await service.SetUserLocalRolesAsync(userId, model.UserLocalRoles.Union(model.NewLocalRole.ToEditModel()), model.CurrentUser);
-
-                        // Промяната на паролата не може да стане в service layer-а, затова се ползва user manager-ът.
-                        if (!string.IsNullOrEmpty(model.NewPassword))
+                    return await TryAsync(
+                        async () =>
                         {
-                            // Текущият потребител има право да променя паролата точно когато има право
-                            // да редактира данните за избрания потребител.
-                            await service.DemandPermission_UpdateUserAsync(userId, "променя паролата на", model.CurrentUser);
+                            // Изпращането на e-mail за промяна на паролата не може да става в service layer-а, затова се ползва user manager-ът.
+                            // Текущият потребител има право да изпраща такъв e-mail точно когато има право да редактира данните на избрания потребител.
+                            await service.DemandPermission_UpdateUserAsync(userId, "разрешава нулиране на паролата на", currentUser);
 
                             using (ApplicationUserManager userManager = CreateUserManager())
                             {
-                                string token = await userManager.GeneratePasswordResetTokenAsync(userId);
-                                DemandSuccess(await userManager.ResetPasswordAsync(userId, token, model.NewPassword));
+                                ApplicationUser user = userManager.FindById(userId);
+                                AuditModel auditModel = AuditUtil.CreateModelForUser(ControllerContext, AuditLevel.Form, AuditTypeCode.LoginError,
+                                    $"Изпращане на e-mail за избор на нова парола до потребител \"{user.UserName}\".", user);
+                                service.Log(auditModel);
+
+                                IdentityResult result = await userManager.SendResetPasswordEmailAsync(user,
+                                    (code) => Url.Action(nameof(AccountController.ResetPassword), "Account", new { userId, code }, protocol: Request.Url.Scheme));
+                                if (!result.Succeeded)
+                                {
+                                    throw new Exception(string.Join(Environment.NewLine, result.Errors));
+                                }
                             }
-                        }
-                    }
-                },
-                () => RedirectToAction(nameof(Index)),
-                () => EditViewAsync(model)
-            );
-        }
-
-        private async Task<ActionResult> EditViewAsync(UserEditModel model)
-        {
-            // Въпреки че записването и EditViewAsync биха могли да споделят един UserManagementService,
-            // той не бива да се dispose-ва с using или трябва да се ползва await TryAsync. Така е по-стабилно.
-            using (UserManagementService usrService = new UserManagementService())
-            {
-                CodeNameModel[] allLocalRoles = await usrService.GetLocalRolesAsync();
-                CodeNameModel[] assignableLocalRoles = await usrService.GetAssignableLocalRolesAsync(model.CurrentUser);
-
-                using (AdministrationService admService = new AdministrationService())
-                {
-                    foreach (UserLocalRoleEditModel role in model.UserLocalRoles)
-                    {
-                        role.AdministrationName = await admService.GetAdministrationNameAsync(role.AdministrationId);
-                        role.LocalRoles = usrService.FilterAssignableLocalRoles(assignableLocalRoles, role.AdministrationId, model.CurrentUser);
-                        if (!string.IsNullOrEmpty(role.LocalRoleCode))
-                        {
-                            role.LocalRoleName = allLocalRoles.First(r => r.Code == role.LocalRoleCode).Name;
-                        }
-                    }
+                            Success("E-mail-ът е изпратен успешно.");
+                        },
+                        () => EditViewAsync(model, service)
+                    );
                 }
+                else
+                {
+                    return await TryAsync(
+                        async () =>
+                        {
+                            await service.UpdateUserAsync(model, currentUser, GetAuditModel());
 
-                await NewLocalRole_SetViewData(model, assignableLocalRoles);
-                // От списъка за избор се премахват всички администрации, в които избраният портебител вече работи.
-                model.NewLocalRole.Administrations = model.NewLocalRole.Administrations.Where(a => !model.UserLocalRoles.Any(r => r.AdministrationId == a.Id));
+                            WorkplaceEditModel[] newWorkplace = model.NewWorkplace.ToEditModel();
+                            await service.SetUserWorkplacesAsync(userId, model.Workplaces.Union(newWorkplace), currentUser, GetAuditModel());
+                        },
+                        () => RedirectToAction(nameof(Edit), new { id = userId }),
+                        () => EditViewAsync(model, service)
+                    );
+                }
             }
+        }
+
+        private async Task<ActionResult> EditViewAsync(UserEditModel model, UserManagementService service)
+        {
+            await service.SetEditModelViewDataAsync(model);
             return View(model);
-        }
-
-        private static async Task NewLocalRole_SetViewData(UserBaseModel model, IEnumerable<CodeNameModel> localRoles)
-        {
-            using (AdministrationService service = new AdministrationService())
-            {
-                model.NewLocalRole.Administrations = await service.GetAllowedAdministrationsAsync(model.CurrentUser);
-            }
-
-            // Може да се показват роли Ръководител и Служител, но кои са разрешени зависи от избраната администрация.
-            // Това се проверява при запис.
-            model.NewLocalRole.LocalRoles = localRoles.Where(r => r.Code != LocalRole.Admin);
-        }
-
-        private async Task PrepareModel(UserBaseModel model)
-        {
-            model.CurrentUser = await User.GetPermissionsAsync();
-            if (model.NewLocalRole == null)
-            {
-                model.NewLocalRole = new UserLocalRoleCreateModel();
-            }
         }
 
         private static void DemandSuccess(IdentityResult result)
@@ -289,26 +221,72 @@ namespace Kontrax.Regux.Portal.Controllers
             }
         }
 
-        private ApplicationUserManager CreateUserManager()
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<ActionResult> IssueCertificate(string id, int? administrationId)
         {
-            return HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
+            _successMessage = "Сертификатът е издаден успешно.";
+            return await TryAsync(
+                async () =>
+                {
+                    if (!administrationId.HasValue)
+                    {
+                        throw new Exception("Не е избрана администрация издател на сертификата.");
+                    }
+                    X509Certificate2 rootCert;
+                    using (AdministrationManagementService admService = new AdministrationManagementService())
+                    {
+                        rootCert = await admService.DemandCertificateWithPrivateKeyAsync(administrationId.Value, CertTypeCode.Root);
+                    }
+
+                    using (ApplicationUserManager userManager = CreateUserManager())
+                    {
+                        ApplicationUser user = await userManager.FindByIdAsync(id);
+                        // Знакът + трябва да се escape-не, защото бил разделител за "multi-valued RDNs".
+                        // http://bouncy-castle.1462172.n4.nabble.com/double-escaping-in-X509Name-td1467978.html
+                        // Ако клас X509Name види escape-нат +, той записва името в кавички: CN="idilov+regux@gmail.com".
+                        string commonName = (user.PersonName ?? user.UserName).Replace("+", "\\+");
+                        string subjectName = $"CN={commonName}";
+                        byte[] userCertificateData;
+                        using (var certificateService = new CertificateService())
+                        {
+                            var userCertificate = certificateService.IssueCertificate(subjectName, rootCert, new[] { "server", "server.mydomain.com" });
+                            userCertificateData = certificateService.WriteCertificate(userCertificate, "password");
+                        }
+                        user.Certificate = userCertificateData;
+                        await userManager.UpdateAsync(user);
+                    }
+                },
+                () => RedirectToAction(nameof(Edit), new { id }),
+                () => RedirectToAction(nameof(Edit), new { id })
+            );
+        }
+
+        [HttpGet]
+        public async Task<FileContentResult> DownloadCertificate(string id)
+        {
+            byte[] bytes;
+            using (UserManagementService service = new UserManagementService())
+            {
+                bytes = await service.GetUserCertificateAsync(id);
+            }
+            return File(bytes, "application/x-pkcs12", $"{id}.pfx");
         }
 
         [HttpPost, ValidateAntiForgeryToken]
-        public Task<ActionResult> Delete(string userId)
+        public Task<ActionResult> Delete(string id)
         {
             _successMessage = "Потребителят е изтрит успешно.";
 
-            return TryAsync(true,
+            return TryAsync(
                 async () =>
                 {
                     using (UserManagementService service = new UserManagementService())
                     {
-                        await service.DeleteUserAsync(userId, await User.GetPermissionsAsync());
+                        await service.DeleteUserAsync(id, await User.GetPermissionsAsync(), GetAuditModel());
                     }
                 },
                 () => RedirectToAction(nameof(Index)),
-                () => RedirectToAction(nameof(Edit), new { id = userId })
+                () => RedirectToAction(nameof(Edit), new { id })
             );
         }
     }

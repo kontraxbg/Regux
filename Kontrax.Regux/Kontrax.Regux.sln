@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.8
+VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kontrax.Regux.Portal", "Kontrax.Regux.Portal\Kontrax.Regux.Portal.csproj", "{1FEC4812-362D-461E-87EB-949C7CC4D11D}"
 EndProject
@@ -17,42 +17,99 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sql", "Sql", "{ED5857DA-1A7
 	ProjectSection(SolutionItems) = preProject
 		Sql\DbInit.sql = Sql\DbInit.sql
 		Sql\Elmah.sql = Sql\Elmah.sql
+		Sql\InitialData.sql = Sql\InitialData.sql
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kontrax.Regux.Public.Portal", "Public\Kontrax.Regux.Public.Portal\Kontrax.Regux.Public.Portal.csproj", "{227B3C8C-E642-4755-A5AB-0C927C23AC99}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kontrax.Regux.RegiXClient", "Kontrax.Regux.RegiXClient\Kontrax.Regux.RegiXClient.csproj", "{559A9EFF-FF51-49AE-8F7E-8B1ED997FDAD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kontrax.EAuth", "Kontrax.EAuth\Kontrax.EAuth.csproj", "{38CFDE5D-4B3E-47DB-AF78-4604D3BFEDF3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kontrax.Xml", "Kontrax.Xml\Kontrax.Xml.csproj", "{1C5E7709-CF68-469D-A88C-1BBA4677644A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kontrax.Regux.Shared.Portal", "Kontrax.Regux.Shared.Portal\Kontrax.Regux.Shared.Portal.csproj", "{95DBCB08-08E1-4710-B32A-7C88BEAB5A32}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
+		TestIIS Dev|Any CPU = TestIIS Dev|Any CPU
+		TestIIS Test|Any CPU = TestIIS Test|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{1FEC4812-362D-461E-87EB-949C7CC4D11D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1FEC4812-362D-461E-87EB-949C7CC4D11D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1FEC4812-362D-461E-87EB-949C7CC4D11D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1FEC4812-362D-461E-87EB-949C7CC4D11D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1FEC4812-362D-461E-87EB-949C7CC4D11D}.TestIIS Dev|Any CPU.ActiveCfg = TestIIS Dev|Any CPU
+		{1FEC4812-362D-461E-87EB-949C7CC4D11D}.TestIIS Dev|Any CPU.Build.0 = TestIIS Dev|Any CPU
+		{1FEC4812-362D-461E-87EB-949C7CC4D11D}.TestIIS Test|Any CPU.ActiveCfg = TestIIS Test|Any CPU
+		{1FEC4812-362D-461E-87EB-949C7CC4D11D}.TestIIS Test|Any CPU.Build.0 = TestIIS Test|Any CPU
 		{48A424ED-0A41-48CC-B54C-7D15F465D5D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{48A424ED-0A41-48CC-B54C-7D15F465D5D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{48A424ED-0A41-48CC-B54C-7D15F465D5D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{48A424ED-0A41-48CC-B54C-7D15F465D5D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{48A424ED-0A41-48CC-B54C-7D15F465D5D7}.TestIIS Dev|Any CPU.ActiveCfg = Release|Any CPU
+		{48A424ED-0A41-48CC-B54C-7D15F465D5D7}.TestIIS Dev|Any CPU.Build.0 = Release|Any CPU
+		{48A424ED-0A41-48CC-B54C-7D15F465D5D7}.TestIIS Test|Any CPU.ActiveCfg = Release|Any CPU
+		{48A424ED-0A41-48CC-B54C-7D15F465D5D7}.TestIIS Test|Any CPU.Build.0 = Release|Any CPU
 		{F3C84976-6E2B-4D26-A687-FD227809E900}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F3C84976-6E2B-4D26-A687-FD227809E900}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F3C84976-6E2B-4D26-A687-FD227809E900}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F3C84976-6E2B-4D26-A687-FD227809E900}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3C84976-6E2B-4D26-A687-FD227809E900}.TestIIS Dev|Any CPU.ActiveCfg = Release|Any CPU
+		{F3C84976-6E2B-4D26-A687-FD227809E900}.TestIIS Dev|Any CPU.Build.0 = Release|Any CPU
+		{F3C84976-6E2B-4D26-A687-FD227809E900}.TestIIS Test|Any CPU.ActiveCfg = Release|Any CPU
+		{F3C84976-6E2B-4D26-A687-FD227809E900}.TestIIS Test|Any CPU.Build.0 = Release|Any CPU
 		{451CF174-3A2C-4C95-8361-FE187FE4353B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{451CF174-3A2C-4C95-8361-FE187FE4353B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{451CF174-3A2C-4C95-8361-FE187FE4353B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{451CF174-3A2C-4C95-8361-FE187FE4353B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{451CF174-3A2C-4C95-8361-FE187FE4353B}.TestIIS Dev|Any CPU.ActiveCfg = Release|Any CPU
+		{451CF174-3A2C-4C95-8361-FE187FE4353B}.TestIIS Dev|Any CPU.Build.0 = Release|Any CPU
+		{451CF174-3A2C-4C95-8361-FE187FE4353B}.TestIIS Test|Any CPU.ActiveCfg = Release|Any CPU
+		{451CF174-3A2C-4C95-8361-FE187FE4353B}.TestIIS Test|Any CPU.Build.0 = Release|Any CPU
 		{227B3C8C-E642-4755-A5AB-0C927C23AC99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{227B3C8C-E642-4755-A5AB-0C927C23AC99}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{227B3C8C-E642-4755-A5AB-0C927C23AC99}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{227B3C8C-E642-4755-A5AB-0C927C23AC99}.Release|Any CPU.Build.0 = Release|Any CPU
+		{227B3C8C-E642-4755-A5AB-0C927C23AC99}.TestIIS Dev|Any CPU.ActiveCfg = Release|Any CPU
+		{227B3C8C-E642-4755-A5AB-0C927C23AC99}.TestIIS Dev|Any CPU.Build.0 = Release|Any CPU
+		{227B3C8C-E642-4755-A5AB-0C927C23AC99}.TestIIS Test|Any CPU.ActiveCfg = TestIIS Test|Any CPU
+		{227B3C8C-E642-4755-A5AB-0C927C23AC99}.TestIIS Test|Any CPU.Build.0 = TestIIS Test|Any CPU
 		{559A9EFF-FF51-49AE-8F7E-8B1ED997FDAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{559A9EFF-FF51-49AE-8F7E-8B1ED997FDAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{559A9EFF-FF51-49AE-8F7E-8B1ED997FDAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{559A9EFF-FF51-49AE-8F7E-8B1ED997FDAD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{559A9EFF-FF51-49AE-8F7E-8B1ED997FDAD}.TestIIS Dev|Any CPU.ActiveCfg = Release|Any CPU
+		{559A9EFF-FF51-49AE-8F7E-8B1ED997FDAD}.TestIIS Dev|Any CPU.Build.0 = Release|Any CPU
+		{559A9EFF-FF51-49AE-8F7E-8B1ED997FDAD}.TestIIS Test|Any CPU.ActiveCfg = Release|Any CPU
+		{559A9EFF-FF51-49AE-8F7E-8B1ED997FDAD}.TestIIS Test|Any CPU.Build.0 = Release|Any CPU
+		{38CFDE5D-4B3E-47DB-AF78-4604D3BFEDF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38CFDE5D-4B3E-47DB-AF78-4604D3BFEDF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38CFDE5D-4B3E-47DB-AF78-4604D3BFEDF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38CFDE5D-4B3E-47DB-AF78-4604D3BFEDF3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38CFDE5D-4B3E-47DB-AF78-4604D3BFEDF3}.TestIIS Dev|Any CPU.ActiveCfg = Release|Any CPU
+		{38CFDE5D-4B3E-47DB-AF78-4604D3BFEDF3}.TestIIS Dev|Any CPU.Build.0 = Release|Any CPU
+		{38CFDE5D-4B3E-47DB-AF78-4604D3BFEDF3}.TestIIS Test|Any CPU.ActiveCfg = Release|Any CPU
+		{38CFDE5D-4B3E-47DB-AF78-4604D3BFEDF3}.TestIIS Test|Any CPU.Build.0 = Release|Any CPU
+		{1C5E7709-CF68-469D-A88C-1BBA4677644A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C5E7709-CF68-469D-A88C-1BBA4677644A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C5E7709-CF68-469D-A88C-1BBA4677644A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C5E7709-CF68-469D-A88C-1BBA4677644A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C5E7709-CF68-469D-A88C-1BBA4677644A}.TestIIS Dev|Any CPU.ActiveCfg = Release|Any CPU
+		{1C5E7709-CF68-469D-A88C-1BBA4677644A}.TestIIS Dev|Any CPU.Build.0 = Release|Any CPU
+		{1C5E7709-CF68-469D-A88C-1BBA4677644A}.TestIIS Test|Any CPU.ActiveCfg = Release|Any CPU
+		{1C5E7709-CF68-469D-A88C-1BBA4677644A}.TestIIS Test|Any CPU.Build.0 = Release|Any CPU
+		{95DBCB08-08E1-4710-B32A-7C88BEAB5A32}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95DBCB08-08E1-4710-B32A-7C88BEAB5A32}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95DBCB08-08E1-4710-B32A-7C88BEAB5A32}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95DBCB08-08E1-4710-B32A-7C88BEAB5A32}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95DBCB08-08E1-4710-B32A-7C88BEAB5A32}.TestIIS Dev|Any CPU.ActiveCfg = Release|Any CPU
+		{95DBCB08-08E1-4710-B32A-7C88BEAB5A32}.TestIIS Dev|Any CPU.Build.0 = Release|Any CPU
+		{95DBCB08-08E1-4710-B32A-7C88BEAB5A32}.TestIIS Test|Any CPU.ActiveCfg = Release|Any CPU
+		{95DBCB08-08E1-4710-B32A-7C88BEAB5A32}.TestIIS Test|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -64,7 +121,7 @@ Global
 		SolutionGuid = {5D3BFB57-347A-4203-993F-C19CE8F89BB1}
 	EndGlobalSection
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 7
+		SccNumberOfProjects = 10
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = http://tfs:8080/tfs/defaultcollection
 		SccLocalPath0 = .
@@ -87,5 +144,14 @@ Global
 		SccProjectUniqueName6 = Kontrax.Regux.RegiXClient\\Kontrax.Regux.RegiXClient.csproj
 		SccProjectName6 = Kontrax.Regux.RegiXClient
 		SccLocalPath6 = Kontrax.Regux.RegiXClient
+		SccProjectUniqueName7 = Kontrax.EAuth\\Kontrax.EAuth.csproj
+		SccProjectName7 = Kontrax.EAuth
+		SccLocalPath7 = Kontrax.EAuth
+		SccProjectUniqueName8 = Kontrax.Xml\\Kontrax.Xml.csproj
+		SccProjectName8 = Kontrax.Xml
+		SccLocalPath8 = Kontrax.Xml
+		SccProjectUniqueName9 = Kontrax.Regux.Shared.Portal\\Kontrax.Regux.Shared.Portal.csproj
+		SccProjectName9 = Kontrax.Regux.Shared.Portal
+		SccLocalPath9 = Kontrax.Regux.Shared.Portal
 	EndGlobalSection
 EndGlobal

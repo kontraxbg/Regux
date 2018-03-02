@@ -1,18 +1,25 @@
-﻿using Kontrax.Regux.Portal.Attributes;
-using System;
+﻿using System;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
+using System.Web;
 using System.Web.Mvc;
+using Kontrax.Regux.Portal.Attributes;
+using Kontrax.Regux.Portal.Audit;
+using Kontrax.Regux.Portal.Identity;
+using Kontrax.Regux.Portal.Util;
+using Kontrax.Regux.Service;
+using Microsoft.AspNet.Identity.Owin;
 
 namespace Kontrax.Regux.Portal.Controllers
 {
-    [Audit(AuditingLevel = AuditingLevelEnum.None)]
     public abstract class BaseController : Controller
     {
         protected IsolationLevel _transactionIsolationLevel = IsolationLevel.ReadCommitted;
         protected string _successMessage;
+
+        #region Audit
 
         /// <summary>
         /// Идентификатор на одит записа или 0, ако не може да се извлече
@@ -30,19 +37,53 @@ namespace Kontrax.Regux.Portal.Controllers
             }
         }
 
-        #region Общ вид на POST action с обработка на грешки и транзакционност.
-
-        protected Task<ActionResult> TryAsync(bool isWriteOperation, Func<Task> tryAsync, Func<ActionResult> success, Func<ActionResult> fail)
+        protected Model.Audit.AuditModel GetAuditModel(AuditLevel auditLevel = AuditLevel.Minimal)
         {
-            return TryAsync(isWriteOperation, tryAsync, () => Task.FromResult(success()), () => Task.FromResult(fail()));
+            return AuditUtil.CreateModel(ControllerContext, auditLevel, Model.Audit.AuditTypeCode.Write);
+        }
+        #endregion
+
+        #region Централно място на създаване на ApplicationUserManager
+        protected ApplicationUserManager CreateUserManager()
+        {
+            ApplicationUserManager manager = HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
+            manager.SetAuditContext(GetAuditModel(AuditLevel.All));
+            return manager;
+        }
+        #endregion
+
+        #region Общ вид на action с обработка на грешки и транзакционност.
+
+        /// <summary>
+        /// Този overload се използва, когато view-то се показва дори ако възникне грешка, обикновео при GET.
+        /// </summary>
+        protected Task<ActionResult> TryAsync(Func<Task> tryAsync, Func<ActionResult> then)
+        {
+            return TryAsync(false, tryAsync, () => Task.FromResult(then()), () => Task.FromResult(then()));
         }
 
-        protected Task<ActionResult> TryAsync(bool isWriteOperation, Func<Task> tryAsync, Func<ActionResult> success, Func<Task<ActionResult>> failAsync)
+        protected Task<ActionResult> TryAsync(Func<Task> tryAsync, Func<Task<ActionResult>> then)
         {
-            return TryAsync(isWriteOperation, tryAsync, () => Task.FromResult(success()), failAsync);
+            return TryAsync(false, tryAsync, () => then(), () => then());
         }
 
-        protected async Task<ActionResult> TryAsync(bool isWriteOperation, Func<Task> tryAsync, Func<Task<ActionResult>> successAsync, Func<Task<ActionResult>> failAsync)
+        /// <summary>
+        /// Този overload се използва при запис на нещо, обикновено с POST.
+        /// </summary>
+        protected Task<ActionResult> TryAsync(Func<Task> tryAsync, Func<ActionResult> success, Func<ActionResult> fail)
+        {
+            return TryAsync(true, tryAsync, () => Task.FromResult(success()), () => Task.FromResult(fail()));
+        }
+
+        /// <summary>
+        /// Този overload се използва при запис на нещо, обикновено с POST.
+        /// </summary>
+        protected Task<ActionResult> TryAsync(Func<Task> tryAsync, Func<ActionResult> success, Func<Task<ActionResult>> failAsync)
+        {
+            return TryAsync(true, tryAsync, () => Task.FromResult(success()), failAsync);
+        }
+
+        private async Task<ActionResult> TryAsync(bool isWriteOperation, Func<Task> tryAsync, Func<Task<ActionResult>> successAsync, Func<Task<ActionResult>> failAsync)
         {
             if (tryAsync == null)
             {
@@ -59,7 +100,7 @@ namespace Kontrax.Regux.Portal.Controllers
 
             if (!ModelState.IsValid)
             {
-                Warning(string.Join("<br />", ModelState.Values.SelectMany(s => s.Errors)
+                Warning(string.Join(Environment.NewLine, ModelState.Values.SelectMany(s => s.Errors)
                     .Where(e => !string.IsNullOrEmpty(e.ErrorMessage) || e.Exception != null)
                     .Select(e => !string.IsNullOrEmpty(e.ErrorMessage) ? e.ErrorMessage : e.Exception.Message)));
                 return await failAsync();
@@ -79,7 +120,7 @@ namespace Kontrax.Regux.Portal.Controllers
             {
                 scope.Dispose();
                 string errorMessage = isWriteOperation ? "Грешка при записването" : "Грешка";
-                LogAndShowErrorAsync(errorMessage, ex);
+                LogAndShowError(errorMessage, ex);
                 return await failAsync();
             }
 
@@ -96,7 +137,7 @@ namespace Kontrax.Regux.Portal.Controllers
             catch (Exception ex)
             {
                 string errorMessage = isWriteOperation ? "Грешка след записването" : "Грешка след действието";
-                LogAndShowErrorAsync(errorMessage, ex);
+                LogAndShowError(errorMessage, ex);
                 return await failAsync();
             }
         }
@@ -128,15 +169,15 @@ namespace Kontrax.Regux.Portal.Controllers
         /// <summary>
         /// Използва се в catch блок, за да запише грешката в базата данни и да я покаже на екрана в Danger панел.
         /// </summary>
-        protected void LogAndShowErrorAsync(string prefix, Exception ex)
+        protected void LogAndShowError(string prefix, Exception ex)
         {
-            Danger(LogAndGetErrorAsync(prefix, ex));
+            Danger(LogAndGetError(prefix, ex));
         }
 
         /// <summary>
         /// За случаите при извикване с ajax, когато няма смисъл от стандартните alert функции.
         /// </summary>
-        protected string LogAndGetErrorAsync(string prefix, Exception ex)
+        protected string LogAndGetError(string prefix, Exception ex)
         {
             if (ex == null)
             {
@@ -149,19 +190,8 @@ namespace Kontrax.Regux.Portal.Controllers
                 Elmah.ErrorSignal.FromCurrentContext().Raise(ex);
                 scope.Complete();
             }
-
-            StringBuilder text = new StringBuilder(ex.Message);
-            while (ex.InnerException != null)
-            {
-                ex = ex.InnerException;
-                text.Insert(0, ex.Message + "; ");
-            }
-            if (!string.IsNullOrEmpty(prefix))
-            {
-                text.Insert(0, prefix + ": ");
-            }
-
-            return text.ToString();
+            string messages = ex.Messages();
+            return !string.IsNullOrEmpty(prefix) ? $"{prefix}: {messages}" : messages;
         }
 
         #endregion
